@@ -1,0 +1,868 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import styles from './ScrollFlythrough.module.css';
+/*
+// Legacy frame-by-frame imports are retained for recovery. The active
+// flythrough uses only the video asset.
+import {
+  frameStore,
+  detectVariant,
+  drawFrameSlice,
+  ZERO_URL,
+  type Slice,
+  type Variant,
+} from '@/lib/asset-loader';
+*/
+
+const GROW_FRAMES = 5;
+// const ZERO_SRC = ZERO_URL;
+// First 6 frames (0-5) dwell over this share of scroll so the
+// image-div -> fullscreen grow is actually visible (not 90px).
+const GROW_SPLIT = 0.22;
+const frameFloatFromP = (p: number, count: number) => {
+  const c = Math.max(0, Math.min(1, p));
+  if (c <= GROW_SPLIT) return (c / GROW_SPLIT) * GROW_FRAMES;
+  return GROW_FRAMES + ((c - GROW_SPLIT) / (1 - GROW_SPLIT)) * (count - 1 - GROW_FRAMES);
+};
+
+const BEATS = [
+  { eyebrow: 'From the street', title: 'It starts outside.', body: 'Jagyasi Mobiles by Mahalaxmi Telecom — evening lights on, doors open.', tags: ['Flagship Store', 'Nandurbar'] },
+  /*
+  { eyebrow: 'Step closer', title: 'Glass doors, warm light.', body: 'Keep scrolling — the camera glides straight through the entrance.', tags: ['Physical-first'] },
+  */
+  { eyebrow: 'Inside the showroom', title: 'Every screen, live.', body: 'Samsung, LG, Sony walls — test everything before you buy.', tags: ['Samsung', 'LG', 'Sony'] },
+  /*
+  { eyebrow: 'Take your time', title: 'Sit. Compare. Decide.', body: 'Lounge seating, honest advice, no rush — this is retail that breathes.', tags: ['Hands-on', 'No Targets'] },
+  */
+  { eyebrow: 'Your turn', title: 'Come walk it for real.', body: 'Or bring this trusted format to your town as a franchise partner.', tags: [], cta: true },
+];
+
+export type EngineMode = 'video' | 'frames';
+export type PacingMode = 'smooth' | '5fps' | '10fps';
+
+export default function ScrollFlythrough({ embedded = false, takeover = false }: { embedded?: boolean; takeover?: boolean }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  // const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
+
+  const [active, setActive] = useState(0);
+  const [loaded, setLoaded] = useState(0);
+  const [ready, setReady] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  // Frame mode is retained below for recovery, but video is the only active engine.
+  const engineMode: EngineMode = 'video';
+  const [pacingMode, setPacingMode] = useState<PacingMode>('smooth');
+
+  const pacingRef = useRef<PacingMode>(pacingMode);
+  useEffect(() => {
+    pacingRef.current = pacingMode;
+  }, [pacingMode]);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // --- 1. VIDEO SCROLLING ENGINE (FOR BOTH DESKTOP & MOBILE) ---
+  useEffect(() => {
+    if (engineMode !== 'video') return;
+    const wrap = wrapRef.current;
+    const video = videoRef.current;
+    if (!wrap || !video) return;
+
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const reduced = motion.matches;
+    let stacked = window.matchMedia('(max-width: 1100px)').matches;
+
+    let near = video.readyState >= 1;
+    let metadataReady = video.readyState >= 1;
+    let target = 0;
+    let current = 0;
+    let raf = 0;
+    let lastBeat = -1;
+    let primed = false;
+    let placed = false;
+    let pendingTime: number | null = null;
+
+    if (metadataReady) {
+      setLoaded(100);
+      setReady(true);
+    }
+
+    type StartRect = { l: number; t: number; w: number; h: number; r: number };
+    let start: StartRect | null = null;
+    const getSource = () => document.querySelector<HTMLElement>('#about-zero-frame');
+    const captureStart = (): StartRect | null => {
+      const fallback = (): StartRect => {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        return { l: vw * 0.1, t: vh * 0.15, w: vw * 0.8, h: vh * 0.7, r: 28 };
+      };
+      const src = getSource();
+      if (src) {
+        const b = src.getBoundingClientRect();
+        if (b.width > 2 && b.height > 2 && b.top > -window.innerHeight && b.top < window.innerHeight) {
+          let r = 3;
+          try { r = parseFloat(getComputedStyle(src).borderRadius) || 3; } catch { /* noop */ }
+          start = { l: b.left, t: b.top, w: b.width, h: b.height, r };
+          return start;
+        }
+      }
+      start = fallback();
+      return start;
+    };
+
+    const placeWrap = () => {
+      if (placed || !takeover) return;
+      if (stacked) {
+        wrap.style.marginTop = '0px';
+        placed = true;
+        return;
+      }
+      const src = getSource();
+      if (!src) return;
+      if (wrap.getBoundingClientRect().top < window.innerHeight) return;
+      const gap = wrap.getBoundingClientRect().top - src.getBoundingClientRect().top;
+      const cur = parseFloat(getComputedStyle(wrap).marginTop) || 0;
+      const m = Math.max(0, gap - cur + window.innerHeight * 0.12);
+      wrap.style.marginTop = `${Math.round(-m)}px`;
+      placed = true;
+    };
+
+    const setSourceHidden = (hidden: boolean) => {
+      const src = getSource();
+      if (!src) return;
+      src.style.transition = 'opacity .25s linear';
+      src.style.opacity = hidden ? '0' : '1';
+    };
+
+    type Phase = 'before' | 'pinned' | 'after';
+    const getPhase = (): Phase => {
+      const rect = wrap.getBoundingClientRect();
+      if (rect.top > 0) return 'before';
+      if (rect.bottom >= window.innerHeight) return 'pinned';
+      return 'after';
+    };
+
+    const layoutStage = (p: number, phase: Phase) => {
+      const stage = stageRef.current;
+      const sticky = stickyRef.current;
+      if (!takeover || !stage || !sticky) return;
+      if (stacked) {
+        stage.style.opacity = '1';
+        stage.style.left = '0px';
+        stage.style.top = '0px';
+        stage.style.width = `${(sticky.clientWidth || window.innerWidth).toFixed(1)}px`;
+        stage.style.height = `${(sticky.clientHeight || window.innerHeight).toFixed(1)}px`;
+        stage.style.borderRadius = '0px';
+        stage.style.pointerEvents = phase === 'before' ? 'none' : 'auto';
+        setSourceHidden(false);
+        if (copyRef.current) {
+          copyRef.current.style.opacity = phase === 'before' ? '0' : '1';
+          copyRef.current.style.transform = 'translateY(0px)';
+          copyRef.current.style.pointerEvents = phase === 'before' ? 'none' : 'auto';
+        }
+        return;
+      }
+      if (phase === 'before') {
+        stage.style.opacity = '0';
+        stage.style.pointerEvents = 'none';
+        start = null;
+        setSourceHidden(false);
+        if (copyRef.current) {
+          copyRef.current.style.opacity = '0';
+          copyRef.current.style.pointerEvents = 'none';
+        }
+        return;
+      }
+      if (phase === 'after') {
+        const vw = sticky.clientWidth || window.innerWidth;
+        const vh = sticky.clientHeight || window.innerHeight;
+        stage.style.opacity = '1';
+        stage.style.left = '0px';
+        stage.style.top = '0px';
+        stage.style.width = `${vw.toFixed(1)}px`;
+        stage.style.height = `${vh.toFixed(1)}px`;
+        stage.style.borderRadius = '0px';
+        stage.style.pointerEvents = 'auto';
+        setSourceHidden(true);
+        if (copyRef.current) {
+          copyRef.current.style.opacity = '1';
+          copyRef.current.style.transform = 'translateY(0px)';
+          copyRef.current.style.pointerEvents = 'auto';
+        }
+        return;
+      }
+      const s = start ?? captureStart();
+      if (!s) return;
+      const vw = sticky.clientWidth || window.innerWidth;
+      const vh = sticky.clientHeight || window.innerHeight;
+      const g = reduced ? 1 : Math.max(0, Math.min(1, p / GROW_SPLIT));
+      const e = g * g * (3 - 2 * g);
+      stage.style.opacity = '1';
+      stage.style.left = `${(s.l + (0 - s.l) * e).toFixed(1)}px`;
+      stage.style.top = `${(s.t + (0 - s.t) * e).toFixed(1)}px`;
+      stage.style.width = `${(s.w + (vw - s.w) * e).toFixed(1)}px`;
+      stage.style.height = `${(s.h + (vh - s.h) * e).toFixed(1)}px`;
+      stage.style.borderRadius = `${Math.round(s.r * (1 - e))}px`;
+      stage.style.pointerEvents = e > 0.9 ? 'auto' : 'none';
+      setSourceHidden(true);
+      if (copyRef.current) {
+        const reveal = Math.max(0, Math.min(1, (e - 0.55) / 0.45));
+        copyRef.current.style.opacity = reveal.toFixed(3);
+        copyRef.current.style.transform = `translateY(${Math.round((1 - reveal) * 18)}px)`;
+        copyRef.current.style.pointerEvents = e > 0.9 ? 'auto' : 'none';
+      }
+    };
+
+    const performSeek = () => {
+      raf = 0;
+      if (!near || !metadataReady || !Number.isFinite(video.duration) || video.duration <= 0) return;
+
+      if (Math.abs(target - current) < 0.0005) {
+        current = target;
+      } else {
+        current += (target - current) * 0.18;
+        raf = requestAnimationFrame(performSeek);
+      }
+
+      if (takeover) {
+        layoutStage(current, getPhase());
+      }
+
+      let seekTime = current * video.duration;
+      const mode = pacingRef.current;
+      if (mode === '5fps') {
+        // Quantize to 5 frames per second (0.20s increments)
+        seekTime = Math.round(seekTime * 5) / 5;
+      } else if (mode === '10fps') {
+        // Quantize to 10 frames per second (0.10s increments)
+        seekTime = Math.round(seekTime * 10) / 10;
+      }
+
+      const clampedTime = Math.min(video.duration - 0.05, Math.max(0, seekTime));
+      if (video.seeking) {
+        pendingTime = clampedTime;
+      } else if (Math.abs(video.currentTime - clampedTime) > 0.015) {
+        video.currentTime = clampedTime;
+        pendingTime = null;
+      }
+    };
+
+    const scheduleSeek = () => {
+      if (!raf) raf = requestAnimationFrame(performSeek);
+    };
+
+    const onScroll = () => {
+      placeWrap();
+      const bounds = wrap.getBoundingClientRect();
+      const distance = Math.max(1, bounds.height - window.innerHeight);
+      target = Math.min(1, Math.max(0, -bounds.top / distance));
+      const beat = Math.min(BEATS.length - 1, Math.floor(target * BEATS.length));
+      if (beat !== lastBeat) {
+        lastBeat = beat;
+        setActive(beat);
+      }
+      if (!takeover && copyRef.current) {
+        copyRef.current.style.opacity = '1';
+        copyRef.current.style.transform = 'translateY(0px)';
+      }
+      scheduleSeek();
+    };
+
+    // This seek-optimized encode uses frequent keyframes so scroll scrubbing
+    // remains smooth even though the temporary source video is shorter.
+    const videoSrc = '/page-section2/JM%20scrolling-temp-smooth.mp4';
+
+    const loadVideo = () => {
+      near = true;
+      video.preload = 'auto';
+      if (!video.src || (!video.src.endsWith(videoSrc) && video.currentSrc !== videoSrc)) {
+        video.src = videoSrc;
+        video.load();
+      } else if (video.readyState >= 1) {
+        metadataReady = true;
+        setLoaded(100);
+        setReady(true);
+      }
+      setLoaded(100);
+      onScroll();
+    };
+
+    const onMetadata = () => {
+      metadataReady = true;
+      near = true;
+      setLoaded(100);
+      setReady(true);
+      scheduleSeek();
+    };
+
+    const onFrame = () => {
+      metadataReady = true;
+      near = true;
+      setReady(true);
+      setLoaded(100);
+    };
+
+    const onSeeked = () => {
+      onFrame();
+      if (pendingTime !== null && Math.abs(video.currentTime - pendingTime) > 0.015) {
+        const next = pendingTime;
+        pendingTime = null;
+        video.currentTime = next;
+      } else {
+        scheduleSeek();
+      }
+    };
+
+    const primeOnInteraction = () => {
+      if (!near || primed) return;
+      primed = true;
+      void video.play().then(() => {
+        video.pause();
+        scheduleSeek();
+      }).catch(() => {
+        primed = false;
+      });
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !near) loadVideo();
+    }, { rootMargin: '200% 0px' });
+
+    video.addEventListener('loadedmetadata', onMetadata);
+    video.addEventListener('loadeddata', onFrame);
+    video.addEventListener('seeked', onSeeked);
+    observer.observe(wrap);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    wrap.addEventListener('touchstart', primeOnInteraction, { passive: true });
+    wrap.addEventListener('mouseenter', primeOnInteraction, { passive: true });
+
+    const onResize = () => {
+      stacked = window.matchMedia('(max-width: 1100px)').matches;
+      placed = false;
+      placeWrap();
+      onScroll();
+    };
+    window.addEventListener('resize', onResize);
+
+    if (wrap.getBoundingClientRect().top < window.innerHeight * 3) {
+      loadVideo();
+    }
+    placeWrap();
+    onScroll();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      wrap.removeEventListener('touchstart', primeOnInteraction);
+      wrap.removeEventListener('mouseenter', primeOnInteraction);
+      video.removeEventListener('loadedmetadata', onMetadata);
+      video.removeEventListener('loadeddata', onFrame);
+      video.removeEventListener('seeked', onSeeked);
+      cancelAnimationFrame(raf);
+      video.pause();
+      setSourceHidden(false);
+    };
+  }, [embedded, takeover, isMobile, engineMode]);
+
+  /*
+  // --- 2. ORIGINAL CANVAS FRAMES ENGINE (FALLBACK / SIDE-BY-SIDE COMPARISON) ---
+  useEffect(() => {
+    if (engineMode !== 'frames') return;
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const variant: Variant = detectVariant();
+    let mobile = variant === 'mobile';
+    let stacked = window.matchMedia('(max-width: 1100px)').matches;
+    let count = 256;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let lastSlice: Slice | null = null;
+    let showingZero = true;
+    let zeroImg: HTMLImageElement | null = frameStore.zeroImg;
+    const containFrame = () => mobile || (takeover && stacked);
+    const drawCover = (img: HTMLImageElement) => {
+      if (!img.naturalWidth) return;
+      drawFrameSlice(ctx, canvas, {
+        img, sx: 0, sy: 0, sw: img.naturalWidth, sh: img.naturalHeight,
+      }, containFrame());
+      showingZero = true;
+      lastSlice = null;
+    };
+    const redraw = () => {
+      if (showingZero) {
+        if (zeroImg?.naturalWidth) drawCover(zeroImg);
+      } else if (lastSlice) {
+        drawFrameSlice(ctx, canvas, lastSlice, containFrame());
+      }
+    };
+    const sizeCanvas = () => {
+      const w = canvas.clientWidth || canvas.getBoundingClientRect().width;
+      const h = canvas.clientHeight || canvas.getBoundingClientRect().height;
+      const deviceDpr = window.devicePixelRatio || 1;
+      const { width: frameWidth, height: frameHeight } = frameStore.frameSize;
+      const sourceDpr = Math.max(1, Math.min(frameWidth / Math.max(1, w), frameHeight / Math.max(1, h)));
+      const dpr = Math.min(deviceDpr, sourceDpr, mobile ? 2.5 : Number.POSITIVE_INFINITY);
+      const W = Math.max(2, Math.round(w * dpr));
+      const H = Math.max(2, Math.round(h * dpr));
+      if (canvas.width !== W || canvas.height !== H) {
+        canvas.width = W;
+        canvas.height = H;
+        redraw();
+      }
+    };
+    sizeCanvas();
+    window.addEventListener('resize', sizeCanvas);
+
+    let target = 0;
+    let current = -1;
+    let raf = 0;
+    let paintedIndex = -1;
+    type StartRect = { l: number; t: number; w: number; h: number; r: number };
+    let start: StartRect | null = null;
+    let placed = false;
+    const getSource = () => document.querySelector<HTMLElement>('#about-zero-frame');
+    const captureStart = (): StartRect | null => {
+      const fallback = (): StartRect => {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        return { l: vw * 0.1, t: vh * 0.15, w: vw * 0.8, h: vh * 0.7, r: 28 };
+      };
+      const src = getSource();
+      if (src) {
+        const b = src.getBoundingClientRect();
+        if (b.width > 2 && b.height > 2 && b.top > -window.innerHeight && b.top < window.innerHeight) {
+          let r = 3;
+          try { r = parseFloat(getComputedStyle(src).borderRadius) || 3; } catch { // noop }
+          start = { l: b.left, t: b.top, w: b.width, h: b.height, r };
+          return start;
+        }
+      }
+      start = fallback();
+      return start;
+    };
+    const placeWrap = () => {
+      if (placed || !takeover) return;
+      if (stacked) {
+        wrap.style.marginTop = '0px';
+        placed = true;
+        return;
+      }
+      const src = getSource();
+      if (!src) return;
+      if (wrap.getBoundingClientRect().top < window.innerHeight) return;
+      const gap = wrap.getBoundingClientRect().top - src.getBoundingClientRect().top;
+      const cur = parseFloat(getComputedStyle(wrap).marginTop) || 0;
+      const m = Math.max(0, gap - cur + window.innerHeight * 0.12);
+      wrap.style.marginTop = `${Math.round(-m)}px`;
+      placed = true;
+    };
+    const setSourceHidden = (hidden: boolean) => {
+      const src = getSource();
+      if (!src) return;
+      src.style.transition = 'opacity .25s linear';
+      src.style.opacity = hidden ? '0' : '1';
+    };
+    type Phase = 'before' | 'pinned' | 'after';
+    const getPhase = (): Phase => {
+      const rect = wrap.getBoundingClientRect();
+      if (rect.top > 0) return 'before';
+      if (rect.bottom >= window.innerHeight) return 'pinned';
+      return 'after';
+    };
+    const layoutStage = (frameFloat: number, phase: Phase) => {
+      const stage = stageRef.current;
+      const sticky = stickyRef.current;
+      if (!takeover || !stage || !sticky) return;
+      if (stacked) {
+        stage.style.opacity = '1';
+        stage.style.left = '0px';
+        stage.style.top = '0px';
+        stage.style.width = `${(sticky.clientWidth || window.innerWidth).toFixed(1)}px`;
+        stage.style.height = `${(sticky.clientHeight || window.innerHeight).toFixed(1)}px`;
+        stage.style.borderRadius = '0px';
+        stage.style.pointerEvents = phase === 'before' ? 'none' : 'auto';
+        setSourceHidden(false);
+        if (copyRef.current) {
+          copyRef.current.style.opacity = phase === 'before' ? '0' : '1';
+          copyRef.current.style.transform = 'translateY(0px)';
+        }
+        sizeCanvas();
+        return;
+      }
+      if (phase === 'before') {
+        stage.style.opacity = '0';
+        stage.style.pointerEvents = 'none';
+        start = null;
+        setSourceHidden(false);
+        if (copyRef.current) copyRef.current.style.opacity = '0';
+        return;
+      }
+      if (phase === 'after') {
+        const vw = sticky.clientWidth || window.innerWidth;
+        const vh = sticky.clientHeight || window.innerHeight;
+        stage.style.opacity = '1';
+        stage.style.left = '0px';
+        stage.style.top = '0px';
+        stage.style.width = `${vw.toFixed(1)}px`;
+        stage.style.height = `${vh.toFixed(1)}px`;
+        stage.style.borderRadius = '0px';
+        stage.style.pointerEvents = 'auto';
+        setSourceHidden(true);
+        if (copyRef.current) {
+          copyRef.current.style.opacity = '1';
+          copyRef.current.style.transform = 'translateY(0px)';
+        }
+        sizeCanvas();
+        return;
+      }
+      const s = start ?? captureStart();
+      if (!s) return;
+      const vw = sticky.clientWidth || window.innerWidth;
+      const vh = sticky.clientHeight || window.innerHeight;
+      const g = reduced ? 1 : Math.max(0, Math.min(1, frameFloat / GROW_FRAMES));
+      const e = g * g * (3 - 2 * g);
+      stage.style.opacity = '1';
+      stage.style.left = `${(s.l + (0 - s.l) * e).toFixed(1)}px`;
+      stage.style.top = `${(s.t + (0 - s.t) * e).toFixed(1)}px`;
+      stage.style.width = `${(s.w + (vw - s.w) * e).toFixed(1)}px`;
+      stage.style.height = `${(s.h + (vh - s.h) * e).toFixed(1)}px`;
+      stage.style.borderRadius = `${Math.round(s.r * (1 - e))}px`;
+      stage.style.pointerEvents = e > 0.9 ? 'auto' : 'none';
+      setSourceHidden(true);
+      if (copyRef.current) {
+        const reveal = Math.max(0, Math.min(1, (e - 0.55) / 0.45));
+        copyRef.current.style.opacity = reveal.toFixed(3);
+        copyRef.current.style.transform = `translateY(${Math.round((1 - reveal) * 18)}px)`;
+      }
+      sizeCanvas();
+    };
+    let phaseCache: Phase = 'before';
+    const drawFrame = (idx: number) => {
+      if (idx === paintedIndex) return;
+      if (idx === 0) {
+        if (zeroImg?.complete && zeroImg.naturalWidth) {
+          showingZero = true;
+          lastSlice = null;
+          drawCover(zeroImg);
+          paintedIndex = idx;
+        }
+        return;
+      }
+      const slice = frameStore.getSlice(idx - 1);
+      if (slice) {
+        showingZero = false;
+        lastSlice = slice;
+        drawFrameSlice(ctx, canvas, slice, containFrame());
+        paintedIndex = idx;
+        return;
+      }
+      const wanted = idx;
+      frameStore
+        .ensureFrame(idx - 1)
+        ?.then(() => {
+          if (Math.round(frameFloatFromP(current, count)) !== wanted) return;
+          const s2 = frameStore.getSlice(wanted - 1);
+          if (s2) {
+            showingZero = false;
+            lastSlice = s2;
+            drawFrameSlice(ctx, canvas, s2, containFrame());
+            paintedIndex = wanted;
+          }
+        })
+        .catch(() => {});
+    };
+    const render = () => {
+      raf = 0;
+      if (Math.abs(target - current) < 0.0005) {
+        current = target;
+        const finalFrame = frameFloatFromP(current, count);
+        drawFrame(Math.max(0, Math.min(count - 1, Math.round(finalFrame))));
+        return;
+      }
+      current += (target - current) * 0.16;
+      const frameFloat = frameFloatFromP(current, count);
+      const idx = Math.max(0, Math.min(count - 1, Math.round(frameFloat)));
+      layoutStage(frameFloat, phaseCache);
+      drawFrame(idx);
+      const beat = Math.min(BEATS.length - 1, Math.floor((idx / (count - 1)) * BEATS.length));
+      setActive((p) => (p === beat ? p : beat));
+      raf = requestAnimationFrame(render);
+    };
+
+    const requestRender = () => {
+      if (!raf) raf = requestAnimationFrame(render);
+    };
+
+    const onScroll = () => {
+      placeWrap();
+      const rect = wrap.getBoundingClientRect();
+      const total = rect.height - window.innerHeight;
+      const p = total <= 0 ? 0 : Math.max(0, Math.min(1, -rect.top / total));
+      target = p;
+      requestRender();
+      if (takeover) {
+        phaseCache = getPhase();
+        layoutStage(frameFloatFromP(p, count), phaseCache);
+      }
+    };
+
+    (async () => {
+      setLoaded(5);
+      try {
+        await frameStore.ensure(variant);
+      } catch {
+        // sheets decode lazily at runtime
+      }
+      count = frameStore.flyTotal > 0 ? frameStore.flyTotal + 1 : count;
+      if (!zeroImg || !zeroImg.naturalWidth) {
+        const fromStore = frameStore.zeroImg;
+        if (fromStore?.naturalWidth) {
+          zeroImg = fromStore;
+        } else {
+          await new Promise<void>((res) => {
+            if (!zeroImg) return res();
+            if (zeroImg.complete && zeroImg.naturalWidth) return res();
+            zeroImg.onload = () => res();
+            zeroImg.onerror = () => res();
+          });
+        }
+      }
+      if (zeroImg?.naturalWidth) {
+        showingZero = true;
+        drawCover(zeroImg);
+      }
+      setLoaded(100);
+      setReady(true);
+      placeWrap();
+      onScroll();
+      current = target;
+      const ff0 = frameFloatFromP(current, count);
+      drawFrame(Math.round(ff0));
+      layoutStage(ff0, phaseCache);
+      requestRender();
+    })();
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const onResize = () => {
+      mobile = detectVariant() === 'mobile';
+      stacked = window.matchMedia('(max-width: 1100px)').matches;
+      placed = false;
+      placeWrap();
+      sizeCanvas();
+      redraw();
+      onScroll();
+    };
+    window.addEventListener('resize', onResize);
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && stageRef.current) {
+      ro = new ResizeObserver(() => sizeCanvas());
+      ro.observe(stageRef.current);
+    }
+    onScroll();
+    return () => {
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', sizeCanvas);
+      window.removeEventListener('resize', onResize);
+      setSourceHidden(false);
+    };
+  }, [embedded, takeover, engineMode]);
+  */
+
+  const posterSrc = isMobile ? '/page-section2/poster-mobile.jpg' : '/page-section2/poster-desktop.jpg';
+
+  /*
+  const renderEngineControls = () => (
+    <aside className={styles.engineBar} aria-label="Flythrough animation engine switcher">
+      <span className={styles.engineLabel}>Mode:</span>
+      <div className={styles.engineGroup} role="group" aria-label="Engine selector">
+        <button
+          type="button"
+          className={`${styles.engineBtn} ${engineMode === 'video' ? styles.engineBtnActive : ''}`}
+          onClick={() => {
+            setReady(false);
+            setEngineMode('video');
+          }}
+        >
+          Video (New)
+        </button>
+        <button
+          type="button"
+          className={`${styles.engineBtn} ${engineMode === 'frames' ? styles.engineBtnActive : ''}`}
+          onClick={() => {
+            setReady(false);
+            setEngineMode('frames');
+          }}
+        >
+          Frames (Canvas)
+        </button>
+      </div>
+
+      {engineMode === 'video' && (
+        <>
+          <span className={styles.engineLabel} style={{ marginLeft: 6 }}>Pacing:</span>
+          <div className={styles.engineGroup} role="group" aria-label="Pacing selector">
+            <button
+              type="button"
+              className={`${styles.engineBtn} ${pacingMode === 'smooth' ? styles.engineBtnActive : ''}`}
+              onClick={() => setPacingMode('smooth')}
+              title="Continuous smooth interpolation"
+            >
+              Smooth
+            </button>
+            <button
+              type="button"
+              className={`${styles.engineBtn} ${pacingMode === '5fps' ? styles.engineBtnActive : ''}`}
+              onClick={() => setPacingMode('5fps')}
+              title="5 frames per second discrete stepping"
+            >
+              5 FPS
+            </button>
+            <button
+              type="button"
+              className={`${styles.engineBtn} ${pacingMode === '10fps' ? styles.engineBtnActive : ''}`}
+              onClick={() => setPacingMode('10fps')}
+              title="10 frames per second discrete stepping"
+            >
+              10 FPS
+            </button>
+          </div>
+        </>
+      )}
+    </aside>
+  );
+  */
+
+  if (takeover) {
+    return (
+      <div ref={wrapRef} className={styles.takeoverWrap}>
+        <div ref={stickyRef} className={styles.takeoverSticky}>
+          {/* Engine controls are intentionally hidden; video/smooth is fixed as
+              the default while the original controls remain above for recovery. */}
+          {/* Desktop grows from #about-zero-frame; stacked layouts use this
+              opening frame as the sole storefront image. */}
+          <div ref={stageRef} className={styles.morphStage}>
+            <video
+              ref={videoRef}
+              className={styles.stageVideo}
+              muted
+              playsInline
+              preload="auto"
+              aria-hidden="true"
+            />
+            {/* Zeroth frame / poster */}
+            <img
+              src={posterSrc}
+              alt=""
+              className={styles.poster}
+              aria-hidden="true"
+              style={{ opacity: ready ? 0 : 1, transition: 'opacity .7s ease' }}
+            />
+            <div className={styles.scrim} aria-hidden="true" />
+            <div className={styles.progress} aria-hidden="true">
+              <span style={{ transform: `scaleX(${loaded / 100})` }} />
+            </div>
+            <div className={styles.rail} aria-hidden="true">
+              {BEATS.map((_, i) => (
+                <span key={i} className={i <= active ? styles.dotOn : styles.dot} />
+              ))}
+            </div>
+            <div ref={copyRef} className={styles.copy} style={isMobile ? { opacity: 1, pointerEvents: 'auto' } : { opacity: 0 }}>
+              <p className={styles.kicker}>
+                Video Mode (SMOOTH) · {loaded}% ready
+              </p>
+              {BEATS.map((b, i) => (
+                <div key={b.title} className={i === active ? styles.beatOn : styles.beat}>
+                  <p className={styles.eyebrow}>{b.eyebrow}</p>
+                  <h2 className={styles.title}>{b.title}</h2>
+                  <p className={styles.body}>{b.body}</p>
+                  {b.tags.length > 0 && (
+                    <div className={styles.tags}>
+                      {b.tags.map((t) => (
+                        <span key={t}>{t}</span>
+                      ))}
+                    </div>
+                  )}
+                  {b.cta && (
+                    <div className={styles.ctaRow}>
+                      <a href="/franchise" className={styles.ctaPrimary}>Open a franchise</a>
+                      <a href="/brands" className={styles.ctaGhost}>Explore brands</a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (embedded) {
+    return (
+      <div ref={wrapRef} className={styles.embedWrap}>
+        {/* Engine controls remain commented out above for recovery. */}
+        <video ref={videoRef} className={styles.stageVideo} muted playsInline preload="auto" aria-hidden="true" />
+        {!ready && <img src={posterSrc} alt="" className={styles.embedPoster} aria-hidden="true" />}
+      </div>
+    );
+  }
+
+  return (
+    <div ref={wrapRef} className={styles.wrap} id="flythrough">
+      <div className={styles.sticky}>
+        {/* Engine controls remain commented out above for recovery. */}
+        <video ref={videoRef} className={styles.stageVideo} muted playsInline preload="auto" aria-hidden="true" />
+        {!ready && <img src={posterSrc} alt="" className={styles.poster} aria-hidden="true" />}
+        <div className={styles.scrim} aria-hidden="true" />
+        <div className={styles.progress} aria-hidden="true">
+          <span style={{ transform: `scaleX(${loaded / 100})` }} />
+        </div>
+        <div className={styles.rail} aria-hidden="true">
+          {BEATS.map((_, i) => (
+            <span key={i} className={i <= active ? styles.dotOn : styles.dot} />
+          ))}
+        </div>
+        <div className={styles.copy}>
+          <p className={styles.kicker}>
+            Video Mode (SMOOTH) · {loaded}% ready
+          </p>
+          {BEATS.map((b, i) => (
+            <div key={b.title} className={i === active ? styles.beatOn : styles.beat}>
+              <p className={styles.eyebrow}>{b.eyebrow}</p>
+              <h2 className={styles.title}>{b.title}</h2>
+              <p className={styles.body}>{b.body}</p>
+              {b.tags.length > 0 && (
+                <div className={styles.tags}>
+                  {b.tags.map((t) => (
+                    <span key={t}>{t}</span>
+                  ))}
+                </div>
+              )}
+              {b.cta && (
+                <div className={styles.ctaRow}>
+                  <a href="/franchise" className={styles.ctaPrimary}>Open a franchise</a>
+                  <a href="/brands" className={styles.ctaGhost}>Explore brands</a>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

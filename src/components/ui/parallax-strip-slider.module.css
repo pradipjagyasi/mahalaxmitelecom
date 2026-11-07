@@ -1,0 +1,225 @@
+.slider {
+  position: relative;
+  width: 100%;
+  height: clamp(740px, 86vh, 960px);
+  min-height: 740px;
+  overflow: hidden;
+  color: #f8f4ec;
+  background: #141312;
+}
+
+.slideTrack {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.slideImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  user-select: none;
+  display: block;
+}
+
+/* Subtle overall background contrast */
+.baseOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(10, 9, 8, 0.18) 0%, rgba(10, 9, 8, 0.42) 100%);
+}
+
+/* Soft, seamless gradient mask with eased 2D feathering to blend smoothly without sharp edges */
+.leftGradientMask {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: min(100%, 960px);
+  z-index: 3;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 95% 80% at 0% 100%,
+      rgba(26, 28, 32, 0.62) 0%,
+      rgba(30, 33, 38, 0.762)25%,
+      rgba(36, 40, 46, 0.45) 50%,
+      rgba(44, 48, 55, 0.13) 72%,
+      rgba(52, 56, 64, 0.03) 88%,
+      transparent 100%
+    );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.98) 25%,
+    rgb(0, 0, 0) 45%,
+    rgba(0, 0, 0, 0.5) 65%,
+    rgba(0, 0, 0, 0.18) 82%,
+    rgba(0, 0, 0, 0.03) 94%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.98) 25%,
+    rgba(0, 0, 0, 0.82) 45%,
+    rgba(0, 0, 0, 0.5) 65%,
+    rgba(0, 0, 0, 0.18) 82%,
+    rgba(0, 0, 0, 0.03) 94%,
+    transparent 100%
+  );
+}
+
+/* Circular navigation buttons */
+.navButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, background-color 0.2s ease;
+}
+
+.prevButton {
+  left: 28px;
+}
+
+.nextButton {
+  right: 28px;
+}
+
+.navButton:hover {
+  transform: translateY(-50%) scale(1.1);
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.navButton:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.navButton svg {
+  display: block;
+}
+
+
+/* Captions overlay */
+.caption {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 120px 48px 56px;
+  pointer-events: none;
+}
+
+.captionInner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: min(92vw, 860px);
+}
+
+.chapter {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #bd884e;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.details {
+  max-width: 100%;
+}
+
+.title {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(40px, 5.2vw, 78px);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  color: #ffffff;
+  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+}
+
+.description {
+  max-width: 480px;
+  margin: 18px 0 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 16px;
+  line-height: 1.6;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.counter {
+  position: absolute;
+  bottom: 56px;
+  right: 48px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 768px) {
+  .slider {
+    height: 640px;
+    min-height: 640px;
+  }
+  .navButton {
+    width: 42px;
+    height: 42px;
+  }
+  .prevButton {
+    left: 14px;
+  }
+  .nextButton {
+    right: 14px;
+  }
+  .caption {
+    padding: 100px 24px 36px;
+  }
+  .leftGradientMask {
+    width: 100%;
+  }
+  .title {
+    font-size: clamp(26px, 7.2vw, 42px);
+    white-space: nowrap;
+  }
+  .description {
+    font-size: 14px;
+    max-width: 34ch;
+  }
+  .counter {
+    bottom: 36px;
+    right: 24px;
+  }
+}

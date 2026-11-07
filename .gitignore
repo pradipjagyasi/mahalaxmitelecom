@@ -1,0 +1,32 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js build and cache outputs
+/.next/
+/out/
+*.tsbuildinfo
+
+# Production build
+/build
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment variables
+.env*
+!.env.example
+
+# Scroll source and intermediate exports (the site uses the WebP frames)
+/JM Scrolling video.mp4
+/public/page-section2/*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
