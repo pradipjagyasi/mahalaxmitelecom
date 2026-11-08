@@ -24,7 +24,7 @@ export function InfiniteSlider({
   className,
 }: InfiniteSliderProps) {
   const [currentDuration, setCurrentDuration] = useState(duration);
-  const [ref, { width, height }] = useMeasure();
+  const [cycleRef, { width, height }] = useMeasure();
   const translation = useMotionValue(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [key, setKey] = useState(0);
@@ -70,7 +70,6 @@ export function InfiniteSlider({
   return (
     <div style={{ overflow: 'hidden', width: '100%', height: '100%' }} className={className}>
       <motion.div
-        ref={ref}
         style={{
           display: 'flex',
           ...(direction === 'horizontal'
@@ -81,8 +80,30 @@ export function InfiniteSlider({
         }}
         {...hoverProps}
       >
-        {children}
-        {children}
+        <div
+          ref={cycleRef}
+          style={{
+            display: 'flex',
+            ...(direction === 'horizontal'
+              ? { width: 'max-content', flexDirection: 'row' }
+              : { width: '100%', flexDirection: 'column' }),
+            gap: `${gap}px`,
+          }}
+        >
+          {children}
+        </div>
+        <div
+          aria-hidden="true"
+          style={{
+            display: 'flex',
+            ...(direction === 'horizontal'
+              ? { width: 'max-content', flexDirection: 'row' }
+              : { width: '100%', flexDirection: 'column' }),
+            gap: `${gap}px`,
+          }}
+        >
+          {children}
+        </div>
       </motion.div>
     </div>
   );
