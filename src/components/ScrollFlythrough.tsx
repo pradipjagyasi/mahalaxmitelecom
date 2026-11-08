@@ -306,9 +306,6 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
       } catch (error) {
         if (loadController.signal.aborted) return;
         console.error('Unable to prepare the showroom video for scrubbing.', error);
-        video.src = videoSrc;
-        video.load();
-        onScroll();
       }
     };
 
@@ -349,14 +346,9 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
       });
     };
 
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !near) loadVideo();
-    }, { rootMargin: '200% 0px' });
-
     video.addEventListener('loadedmetadata', onMetadata);
     video.addEventListener('loadeddata', onFrame);
     video.addEventListener('seeked', onSeeked);
-    observer.observe(wrap);
     window.addEventListener('scroll', onScroll, { passive: true });
     wrap.addEventListener('touchstart', primeOnInteraction, { passive: true });
     wrap.addEventListener('mouseenter', primeOnInteraction, { passive: true });
@@ -369,14 +361,11 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
     };
     window.addEventListener('resize', onResize);
 
-    if (wrap.getBoundingClientRect().top < window.innerHeight * 3) {
-      loadVideo();
-    }
+    void loadVideo();
     placeWrap();
     onScroll();
 
     return () => {
-      observer.disconnect();
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       wrap.removeEventListener('touchstart', primeOnInteraction);
@@ -390,7 +379,7 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
       video.pause();
       setSourceHidden(false);
     };
-  }, [embedded, takeover, isMobile, engineMode]);
+  }, [embedded, takeover, engineMode]);
 
   /*
   // --- 2. ORIGINAL CANVAS FRAMES ENGINE (FALLBACK / SIDE-BY-SIDE COMPARISON) ---
