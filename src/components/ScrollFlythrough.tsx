@@ -21,6 +21,8 @@ const GROW_FRAMES = 5;
 // First 6 frames (0-5) dwell over this share of scroll so the
 // image-div -> fullscreen grow is actually visible (not 90px).
 const GROW_SPLIT = 0.22;
+// Reserve the final part of the pinned scroll for the closing frame.
+const VIDEO_END_PROGRESS = 0.9;
 const frameFloatFromP = (p: number, count: number) => {
   const c = Math.max(0, Math.min(1, p));
   if (c <= GROW_SPLIT) return (c / GROW_SPLIT) * GROW_FRAMES;
@@ -242,7 +244,7 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
         layoutStage(current, phase);
       }
 
-      let seekTime = current * video.duration;
+      let seekTime = Math.min(1, current / VIDEO_END_PROGRESS) * video.duration;
       const mode = pacingRef.current;
       if (mode === '5fps') {
         // Quantize to 5 frames per second (0.20s increments)
@@ -306,8 +308,6 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
     const onMetadata = () => {
       metadataReady = true;
       near = true;
-      setLoaded(100);
-      setReady(true);
       scheduleSeek();
     };
 

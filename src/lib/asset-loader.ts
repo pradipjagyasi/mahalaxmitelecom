@@ -119,7 +119,7 @@ const decodeImage = (url: string): Promise<void> =>
 
 export const preloadScrollVideo = (onProgress: (fraction: number) => void = () => {}): Promise<string> => {
   if (scrollVideoPromise) {
-    void scrollVideoPromise.then(() => onProgress(1));
+    void scrollVideoPromise.then(() => onProgress(1), () => {});
     return scrollVideoPromise;
   }
 

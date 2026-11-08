@@ -52,15 +52,23 @@ const suppliedUnsplashPhotos: Record<string, string> = {
 const unsplashDownload = (photo: string) =>
   unsplash(suppliedUnsplashPhotos[photo] ?? photo);
 
+const HOMEPAGE_VISITED_KEY = "mahalaxmi-homepage-ready-v1";
+
 export default function Home() {
-  // Keep the homepage unmounted until its imagery and seek-optimized scroll
-  // video are downloaded, decoded, and ready to be reused from browser memory.
   const [loadProgress, setLoadProgress] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    try {
+      if (localStorage.getItem(HOMEPAGE_VISITED_KEY) === "true") {
+        setRevealed(true);
+        return () => { cancelled = true; };
+      }
+    } catch {
+      // Storage may be disabled; use the first-visit loader in that case.
+    }
     void preloadHomepageAssets((progress) => {
       if (!cancelled) setLoadProgress(progress);
     }).catch((error) => {
@@ -77,6 +85,11 @@ export default function Home() {
   }, []);
 
   const handleLoadingComplete = useCallback(() => {
+    try {
+      localStorage.setItem(HOMEPAGE_VISITED_KEY, "true");
+    } catch {
+      // The homepage remains usable even if storage is unavailable.
+    }
     setRevealed(true);
   }, []);
 
