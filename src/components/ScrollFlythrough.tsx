@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import styles from './ScrollFlythrough.module.css';
+import { preloadScrollVideo } from '@/lib/asset-loader';
 /*
 // Legacy frame-by-frame imports are retained for recovery. The active
 // flythrough uses only the video asset.
@@ -89,7 +90,7 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
     let primed = false;
     let placed = false;
     let pendingTime: number | null = null;
-    let objectUrl: string | null = null;
+    let lastTick = 0;
     const loadController = new AbortController();
 
     if (metadataReady) {
@@ -145,18 +146,16 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
     };
 
     type Phase = 'before' | 'pinned' | 'after';
-    const getPhase = (): Phase => {
-      const rect = wrap.getBoundingClientRect();
-      if (rect.top > 0) return 'before';
-      if (rect.bottom >= window.innerHeight) return 'pinned';
-      return 'after';
-    };
+    let phase: Phase = 'before';
+    let lastStackedPhase: Phase | null = null;
 
     const layoutStage = (p: number, phase: Phase) => {
       const stage = stageRef.current;
       const sticky = stickyRef.current;
       if (!takeover || !stage || !sticky) return;
       if (stacked) {
+        if (lastStackedPhase === phase) return;
+        lastStackedPhase = phase;
         stage.style.opacity = '1';
         stage.style.left = '0px';
         stage.style.top = '0px';
@@ -223,19 +222,24 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
       }
     };
 
-    const performSeek = () => {
+    const performSeek = (timestamp: number) => {
       raf = 0;
       if (!near || !metadataReady || !Number.isFinite(video.duration) || video.duration <= 0) return;
 
       if (Math.abs(target - current) < 0.0005) {
         current = target;
+        lastTick = 0;
       } else {
-        current += (target - current) * 0.18;
+        // Match the reference's 0.18 easing at 60 Hz, independent of display
+        // refresh rate. Cap long gaps after a tab is suspended.
+        const elapsed = lastTick ? Math.min(timestamp - lastTick, 50) : 1000 / 60;
+        lastTick = timestamp;
+        current += (target - current) * (1 - Math.pow(1 - 0.18, elapsed / (1000 / 60)));
         raf = requestAnimationFrame(performSeek);
       }
 
       if (takeover) {
-        layoutStage(current, getPhase());
+        layoutStage(current, phase);
       }
 
       let seekTime = current * video.duration;
@@ -266,6 +270,7 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
       const bounds = wrap.getBoundingClientRect();
       const distance = Math.max(1, bounds.height - window.innerHeight);
       target = Math.min(1, Math.max(0, -bounds.top / distance));
+      phase = bounds.top > 0 ? 'before' : bounds.bottom >= window.innerHeight ? 'pinned' : 'after';
       const beat = Math.min(BEATS.length - 1, Math.floor(target * BEATS.length));
       if (beat !== lastBeat) {
         lastBeat = beat;
@@ -280,27 +285,16 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
 
     // This seek-optimized encode uses frequent keyframes so scroll scrubbing
     // remains smooth even though the temporary source video is shorter.
-    const videoSrc = '/page-section2/JM%20scrolling-temp-smooth.mp4';
-
     const loadVideo = async () => {
       near = true;
       video.preload = 'auto';
       setLoaded(10);
 
       try {
-        const response = await fetch(videoSrc, {
-          cache: 'force-cache',
-          signal: loadController.signal,
-        });
-        if (!response.ok) {
-          throw new Error(`Video request failed with status ${response.status}`);
-        }
-
-        const blob = await response.blob();
         if (loadController.signal.aborted) return;
-
-        objectUrl = URL.createObjectURL(blob);
-        video.src = objectUrl;
+        const sharedObjectUrl = await preloadScrollVideo();
+        if (loadController.signal.aborted) return;
+        video.src = sharedObjectUrl;
         video.load();
         onScroll();
       } catch (error) {
@@ -355,6 +349,7 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
 
     const onResize = () => {
       stacked = window.matchMedia('(max-width: 1100px)').matches;
+      lastStackedPhase = null;
       placed = false;
       placeWrap();
       onScroll();
@@ -375,7 +370,6 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
       video.removeEventListener('seeked', onSeeked);
       cancelAnimationFrame(raf);
       loadController.abort();
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
       video.pause();
       setSourceHidden(false);
     };

@@ -1,164 +1,114 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 
 import { LOADING_LOGO_BASE64 } from './loading-logo-base64';
+import styles from './LoadingScreen.module.css';
 
 interface LoadingScreenProps {
   /** 0-100 download progress driven by the asset preloader. */
   progress: number;
+  error?: string;
   onComplete?: () => void;
 }
 
-export default function LoadingScreen({ progress, onComplete }: LoadingScreenProps) {
+const MIN_VISIBLE_MS = 900;
+const FADE_MS = 700;
+
+export default function LoadingScreen({ progress, error, onComplete }: LoadingScreenProps) {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const doneRef = useRef(false);
+  const mountedAtRef = useRef(Date.now());
+  const retryRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (progress < 100 || doneRef.current) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (error) retryRef.current?.focus();
+  }, [error]);
+
+  useEffect(() => {
+    if (progress < 100 || error || doneRef.current) return;
     doneRef.current = true;
-    let fadeId: ReturnType<typeof setTimeout> | undefined;
-    const holdId = setTimeout(() => {
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const elapsed = Date.now() - mountedAtRef.current;
+    const holdFor = Math.max(250, MIN_VISIBLE_MS - elapsed);
+    let fadeId: number | undefined;
+    const holdId = window.setTimeout(() => {
       setIsFadingOut(true);
-      fadeId = setTimeout(() => {
-        onComplete?.();
-      }, 700);
-    }, 250);
+      fadeId = window.setTimeout(() => onComplete?.(), reducedMotion ? 0 : FADE_MS);
+    }, holdFor);
 
     return () => {
-      clearTimeout(holdId);
-      if (fadeId) clearTimeout(fadeId);
+      window.clearTimeout(holdId);
+      if (fadeId) window.clearTimeout(fadeId);
       doneRef.current = false;
     };
-  }, [progress, onComplete]);
+  }, [progress, error, onComplete]);
 
   const pct = Math.max(0, Math.min(100, Math.floor(progress)));
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#000000',
-        userSelect: 'none',
-        opacity: isFadingOut ? 0 : 1,
-        transition: 'opacity 700ms cubic-bezier(0.16, 1, 0.3, 1)',
-        pointerEvents: isFadingOut ? 'none' : 'auto',
-      }}
+      className={`${styles.screen}${isFadingOut ? ` ${styles.screenFading}` : ''}`}
+      role={error ? 'alert' : 'status'}
+      aria-live={error ? 'assertive' : 'polite'}
+      aria-busy={!error && pct < 100}
+      aria-label={error ? 'Homepage loading failed' : 'Preparing the Mahalaxmi Telecom homepage'}
     >
-      {/* GOLD MAHALAXMI IMAGE LOGO + TEXT LOCKUP */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '28px',
-          marginBottom: '44px',
-        }}
-      >
-        {/* Instant Inlined Base64 Mahalaxmi Logo */}
-        <div style={{ position: 'relative', width: '110px', height: '110px', flexShrink: 0 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={LOADING_LOGO_BASE64}
-            alt="Mahalaxmi Telecom Logo"
-            width={110}
-            height={110}
-            style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-          />
-        </div>
-
-        {/* Brand Text */}
-        <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left', gap: '4px' }}>
-          {/* MAHALAXMI TELECOM */}
-          <h1
-            style={{
-              margin: 0,
-              fontSize: '28px',
-              fontFamily:
-                'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontWeight: 800,
-              letterSpacing: '0.1em',
-              color: '#FFFFFF',
-              lineHeight: 1.1,
-              textTransform: 'uppercase',
-            }}
-          >
-            MAHALAXMI TELECOM
-          </h1>
-
-          {/* PRIVATE LIMITED */}
-          <span
-            style={{
-              fontSize: '13px',
-              fontFamily:
-                'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontWeight: 600,
-              letterSpacing: '0.28em',
-              color: '#D4AF37',
-              textTransform: 'uppercase',
-            }}
-          >
-            PRIVATE LIMITED
-          </span>
+      <div className={styles.brandLockup}>
+        <img
+          src={LOADING_LOGO_BASE64}
+          alt=""
+          width={110}
+          height={110}
+          className={styles.logo}
+          aria-hidden="true"
+        />
+        <div className={styles.brandText}>
+          <p className={styles.brandName}>Mahalaxmi Telecom</p>
+          <p className={styles.brandLegal}>Private Limited</p>
         </div>
       </div>
 
-      {/* THIN GOLD LOADING BAR */}
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '320px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          paddingInline: '24px',
-        }}
-      >
+      <div className={styles.loadingPanel}>
         <div
-          style={{
-            width: '100%',
-            height: '2.5px',
-            backgroundColor: '#1a1a1a',
-            borderRadius: '9999px',
-            overflow: 'hidden',
-          }}
+          className={styles.progressTrack}
+          role="progressbar"
+          aria-label="Homepage assets downloaded"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={pct}
+          aria-valuetext={error ? `Loading stopped at ${pct} percent` : `${pct} percent loaded`}
         >
-          <div
-            style={{
-              width: `${pct}%`,
-              height: '100%',
-              borderRadius: '9999px',
-              transition: 'width 30ms linear',
-              background:
-                'linear-gradient(90deg, #8A6414 0%, #D4AF37 55%, #FFF2B2 100%)',
-              boxShadow: '0 0 8px rgba(212, 175, 55, 0.5)',
-            }}
-          />
+          <span className={styles.progressFill} style={{ transform: `scaleX(${pct / 100})` }} />
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '100%',
-            marginTop: '10px',
-            fontSize: '10px',
-            fontFamily: 'monospace',
-            letterSpacing: '0.2em',
-            color: 'rgba(212, 175, 55, 0.7)',
-          }}
-        >
-          <span>LOADING</span>
-          <span style={{ fontWeight: 600 }}>{pct}%</span>
+        <div className={styles.progressMeta} aria-hidden="true">
+          <span>{error ? 'Load error' : pct === 100 ? 'Ready' : 'Loading'}</span>
+          <span className={styles.progressNumber}>{pct}%</span>
         </div>
+
+        {error && (
+          <div className={styles.errorBlock}>
+            <p>{error}</p>
+            <button
+              ref={retryRef}
+              type="button"
+              onClick={() => window.location.reload()}
+              className={styles.retryButton}
+            >
+              Retry loading
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

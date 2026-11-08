@@ -8,7 +8,7 @@ import ScrollFlythrough from "@/components/ScrollFlythrough";
 import { Typewriter } from "@/components/ui/typewriter-text";
 import LoadingScreen from "@/components/ui/LoadingScreen";
 import {
-  preloadLogo,
+  preloadHomepageAssets,
 } from "@/lib/asset-loader";
 import styles from "./page.module.css";
 
@@ -53,69 +53,45 @@ const unsplashDownload = (photo: string) =>
   unsplash(suppliedUnsplashPhotos[photo] ?? photo);
 
 export default function Home() {
-  // Reveal after the opening full-HD frames and hero imagery are ready.
-  // The rest of the sequence downloads in the background.
-  const [booted, setBooted] = useState(false);
+  // Keep the homepage unmounted until its imagery and seek-optimized scroll
+  // video are downloaded, decoded, and ready to be reused from browser memory.
   const [loadProgress, setLoadProgress] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const [hasVisited, setHasVisited] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    const alreadyLoaded =
-      typeof window !== "undefined" &&
-      sessionStorage.getItem("mahalaxmi_initial_loaded") === "true";
-    if (alreadyLoaded) {
-      setHasVisited(true);
-      setBooted(true);
-      setRevealed(true);
-      return;
-    }
-
     let cancelled = false;
-    (async () => {
-      await preloadLogo();
-      if (cancelled) return;
-      setBooted(true);
-      // Frame-by-frame preloading is intentionally disabled; the flythrough
-      // uses the video asset directly.
-      if (cancelled) return;
-      setLoadProgress(100);
-    })();
+    void preloadHomepageAssets((progress) => {
+      if (!cancelled) setLoadProgress(progress);
+    }).catch((error) => {
+      if (!cancelled) {
+        console.error("Homepage asset preload failed.", error);
+        setLoadError(
+          "Some homepage assets could not be loaded. Please try again.",
+        );
+      }
+    });
     return () => {
       cancelled = true;
     };
   }, []);
 
   const handleLoadingComplete = useCallback(() => {
-    try {
-      sessionStorage.setItem("mahalaxmi_initial_loaded", "true");
-    } catch {
-      /* ignore storage error */
-    }
     setRevealed(true);
   }, []);
 
   return (
     <>
-      {!booted && !hasVisited && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 9999,
-            background: "#000",
-          }}
-        />
-      )}
-      {booted && !revealed && !hasVisited && (
+      {!revealed && (
         <LoadingScreen
           progress={loadProgress}
+          error={loadError ?? undefined}
           onComplete={handleLoadingComplete}
         />
       )}
-      <SiteShell transparentOnTop>
-        <main id="main-content">
+      {revealed && (
+        <SiteShell transparentOnTop>
+          <main id="main-content">
           <section id="hero" className={styles.heroSection}>
             <HeroBackground />
             <div className={`container ${styles.heroContainer}`}>
@@ -489,11 +465,12 @@ export default function Home() {
             </div>
             <ScrollFlythrough takeover />
           </section>
-        </main>
-        <StoreOutletBrandsSection />
-        <WhyPartnerSection />
-        <VisionAndOpportunitySection />
-      </SiteShell>
+          </main>
+          <StoreOutletBrandsSection />
+          <WhyPartnerSection />
+          <VisionAndOpportunitySection />
+        </SiteShell>
+      )}
     </>
   );
 }
