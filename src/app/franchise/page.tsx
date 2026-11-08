@@ -428,7 +428,7 @@ export default function FranchisePage() {
                 </span>
                 <div className={businessStyles.businessHierarchyStep}>
                   <p className={businessStyles.businessHierarchyName}>
-                    Apple {"\u2022"} Samsung {"\u2022"} vivo {"\u2022"} OPPO
+                    Apple {"\u2022"} Samsung {"\u2022"} OPPO 
                   </p>
                   <p className={businessStyles.businessHierarchyRole}>
                     Brands You Retail

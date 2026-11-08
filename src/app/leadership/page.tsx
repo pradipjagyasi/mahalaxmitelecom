@@ -36,8 +36,8 @@ const DIRECTORS = [
   },
   {
     id: "NW",
-    slug: "nilesh-wadhvani",
-    name: "Nilesh Wadhvani",
+    slug: "nilesh-wadhwani",
+    name: "Nilesh wadhwani",
     role: "Whole-Time Director",
     bio: "",
     photo: portrait("1472099645785-5658abf4ff4e"),
@@ -334,7 +334,7 @@ export default function LeadershipPage() {
                   fontWeight: 700,
                 }}
               >
-                Nilesh Wadhvani
+                Nilesh Wadhwani
               </h3>
               <p
                 style={{
@@ -356,7 +356,7 @@ export default function LeadershipPage() {
                   lineHeight: 1.65,
                 }}
               >
-                Nilesh Wadhvani is the Whole-Time Director manages the clients
+                Nilesh Wadhwani is the Whole-Time Director manages the clients
                 of Mahalaxmi Telecom Private Limited.
               </p>
             </div>

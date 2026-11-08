@@ -33,9 +33,6 @@ export const metadata: Metadata = {
   creator: siteName,
   publisher: siteName,
   category: 'Mobile retail and consumer electronics',
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
@@ -70,8 +67,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/mahalaxmi-logo-loading.png',
-    apple: '/mahalaxmi-logo-loading.png',
+    icon: { url: '/icons/mahalaxmi-48-v1.png', type: 'image/png', sizes: '48x48' },
+    apple: { url: '/icons/mahalaxmi-180-v1.png', type: 'image/png', sizes: '180x180' },
   },
 };
 

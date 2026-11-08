@@ -13,14 +13,14 @@ import {
 import styles from "./page.module.css";
 
 const heroImages = [
-  "/page-section%201/Slider/1.png",
-  "/page-section%201/Slider/2.png",
-  "/page-section%201/Slider/3.png",
-  "/page-section%201/Slider/4.png",
-  "/page-section%201/Slider/5.png",
-  "/page-section%201/Slider/6.png",
-  "/page-section%201/Slider/7.png",
-  "/page-section%201/Slider/8.png",
+  "/page-section%201/Slider/hero-1-v1.webp",
+  "/page-section%201/Slider/hero-2-v1.webp",
+  "/page-section%201/Slider/hero-3-v1.webp",
+  "/page-section%201/Slider/hero-4-v1.webp",
+  "/page-section%201/Slider/hero-5-v1.webp",
+  "/page-section%201/Slider/hero-6-v1.webp",
+  "/page-section%201/Slider/hero-7-v1.webp",
+  "/page-section%201/Slider/hero-8-v1.webp",
 ];
 
 const unsplash = (id: string) =>
@@ -69,18 +69,28 @@ export default function Home() {
     } catch {
       // Storage may be disabled; use the first-visit loader in that case.
     }
+    // Never let a stalled asset keep the homepage hidden indefinitely.
+    const fallbackTimer = window.setTimeout(() => {
+      if (!cancelled) {
+        cancelled = true;
+        setRevealed(true);
+      }
+    }, 12_000);
     void preloadHomepageAssets((progress) => {
       if (!cancelled) setLoadProgress(progress);
+    }).then(() => {
+      window.clearTimeout(fallbackTimer);
     }).catch((error) => {
       if (!cancelled) {
         console.error("Homepage asset preload failed.", error);
         setLoadError(
-          "Some homepage assets could not be loaded. Please try again.",
+          "Some content is taking longer to load. You can continue to the website.",
         );
       }
     });
     return () => {
       cancelled = true;
+      window.clearTimeout(fallbackTimer);
     };
   }, []);
 
@@ -100,9 +110,9 @@ export default function Home() {
           progress={loadProgress}
           error={loadError ?? undefined}
           onComplete={handleLoadingComplete}
+          onContinue={() => setRevealed(true)}
         />
       )}
-      {revealed && (
         <SiteShell transparentOnTop>
           <main id="main-content">
           <section id="hero" className={styles.heroSection}>
@@ -476,14 +486,13 @@ export default function Home() {
                 />
               </div>
             </div>
-            <ScrollFlythrough takeover />
+            <ScrollFlythrough takeover enabled={revealed} />
           </section>
           </main>
           <StoreOutletBrandsSection />
           <WhyPartnerSection />
           <VisionAndOpportunitySection />
         </SiteShell>
-      )}
     </>
   );
 }

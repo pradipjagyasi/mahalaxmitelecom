@@ -322,23 +322,30 @@ export default function SiteShell({
           >
             <h4 className="footer-col-title">Stay Updated</h4>
             <p className="footer-newsletter-text">
-              Get franchise openings and store news in your inbox.
+              Contact us to ask about franchise openings and store news.
             </p>
             <form
               className="footer-newsletter-form"
               id="footer-newsletter-form"
-              action="#"
-              method="post"
+              action="/contact#enquiry-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                const email = new FormData(event.currentTarget).get("newsletter-email");
+                if (typeof email !== "string" || !email.trim()) return;
+                window.location.assign(`/contact#enquiry-email=${encodeURIComponent(email.trim())}`);
+              }}
             >
               <input
                 className="newsletter-input"
                 type="email"
                 name="newsletter-email"
+                aria-label="Your email address"
+                autoComplete="email"
                 placeholder="Your email address"
                 required
               />
               <button className="newsletter-submit-btn" type="submit">
-                Subscribe
+                Continue
               </button>
             </form>
           </div>

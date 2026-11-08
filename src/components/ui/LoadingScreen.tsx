@@ -10,12 +10,13 @@ interface LoadingScreenProps {
   progress: number;
   error?: string;
   onComplete?: () => void;
+  onContinue?: () => void;
 }
 
 const MIN_VISIBLE_MS = 900;
 const FADE_MS = 700;
 
-export default function LoadingScreen({ progress, error, onComplete }: LoadingScreenProps) {
+export default function LoadingScreen({ progress, error, onComplete, onContinue }: LoadingScreenProps) {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const doneRef = useRef(false);
   const mountedAtRef = useRef(Date.now());
@@ -32,6 +33,12 @@ export default function LoadingScreen({ progress, error, onComplete }: LoadingSc
   useEffect(() => {
     if (error) retryRef.current?.focus();
   }, [error]);
+
+  useEffect(() => {
+    if (!error || !onContinue) return;
+    const timer = window.setTimeout(onContinue, 2000);
+    return () => window.clearTimeout(timer);
+  }, [error, onContinue]);
 
   useEffect(() => {
     if (progress < 100 || error || doneRef.current) return;
@@ -63,6 +70,7 @@ export default function LoadingScreen({ progress, error, onComplete }: LoadingSc
       aria-busy={!error && pct < 100}
       aria-label={error ? 'Homepage loading failed' : 'Preparing the Mahalaxmi Telecom homepage'}
     >
+      <noscript><style>{`.${styles.screen}{display:none}`}</style></noscript>
       <div className={styles.brandLockup}>
         <img
           src={LOADING_LOGO_BASE64}
@@ -82,11 +90,11 @@ export default function LoadingScreen({ progress, error, onComplete }: LoadingSc
         <div
           className={styles.progressTrack}
           role="progressbar"
-          aria-label="Homepage assets downloaded"
+          aria-label="Preparing the homepage"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={pct}
-          aria-valuetext={error ? `Loading stopped at ${pct} percent` : `${pct} percent loaded`}
+          aria-valuetext={error ? `Preparation stopped at ${pct} percent` : `${pct} percent prepared`}
         >
           <span className={styles.progressFill} style={{ transform: `scaleX(${pct / 100})` }} />
         </div>
@@ -107,6 +115,11 @@ export default function LoadingScreen({ progress, error, onComplete }: LoadingSc
             >
               Retry loading
             </button>
+            {onContinue && (
+              <button type="button" onClick={onContinue} className={styles.retryButton}>
+                Continue to website
+              </button>
+            )}
           </div>
         )}
       </div>

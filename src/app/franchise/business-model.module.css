@@ -579,13 +579,14 @@
     grid-template-columns: 1fr;
   }
   .businessCustomerSteps {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .businessStepArrow {
-    right: 50%;
+    left: 50%;
+    right: auto;
     top: auto;
-    bottom: -22px;
-    transform: translateX(50%) rotate(90deg);
+    bottom: -12px;
+    transform: translate(-50%, 50%) rotate(90deg);
   }
   .businessHierarchy {
     flex-direction: column;

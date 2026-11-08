@@ -44,7 +44,7 @@ const BEATS = [
 export type EngineMode = 'video' | 'frames';
 export type PacingMode = 'smooth' | '5fps' | '10fps';
 
-export default function ScrollFlythrough({ embedded = false, takeover = false }: { embedded?: boolean; takeover?: boolean }) {
+export default function ScrollFlythrough({ embedded = false, takeover = false, enabled = true }: { embedded?: boolean; takeover?: boolean; enabled?: boolean }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   // const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -74,7 +74,7 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
 
   // --- 1. VIDEO SCROLLING ENGINE (FOR BOTH DESKTOP & MOBILE) ---
   useEffect(() => {
-    if (engineMode !== 'video') return;
+    if (!enabled || engineMode !== 'video') return;
     const wrap = wrapRef.current;
     const video = videoRef.current;
     if (!wrap || !video) return;
@@ -373,7 +373,7 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
       video.pause();
       setSourceHidden(false);
     };
-  }, [embedded, takeover, engineMode]);
+  }, [embedded, takeover, engineMode, enabled]);
 
   /*
   // --- 2. ORIGINAL CANVAS FRAMES ENGINE (FALLBACK / SIDE-BY-SIDE COMPARISON) ---

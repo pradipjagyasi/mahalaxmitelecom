@@ -11,14 +11,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/leadership',
     '/contact',
     '/faq',
-    '/privacy-policy',
-    '/terms-and-conditions',
+    '/legal/privacy-policy.html',
+    '/legal/terms-and-conditions.html',
   ];
 
   return routes.map((route) => ({
     url: `${siteUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: route === '' ? 'weekly' : 'monthly',
-    priority: route === '' ? 1 : 0.8,
   }));
 }

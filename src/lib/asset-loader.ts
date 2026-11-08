@@ -25,14 +25,14 @@ const LOGO_URL = '/mahalaxmi-logo.png';
 export const SCROLL_VIDEO_URL = '/page-section2/JM%20scrolling-temp-smooth.mp4';
 export const ZERO_URL = `${FRAME_BASE}frame-000.webp`;
 const HERO_URLS = [
-  '/page-section%201/Slider/1.png',
-  '/page-section%201/Slider/2.png',
-  '/page-section%201/Slider/3.png',
-  '/page-section%201/Slider/4.png',
-  '/page-section%201/Slider/5.png',
-  '/page-section%201/Slider/6.png',
-  '/page-section%201/Slider/7.png',
-  '/page-section%201/Slider/8.png',
+  '/page-section%201/Slider/hero-1-v1.webp',
+  '/page-section%201/Slider/hero-2-v1.webp',
+  '/page-section%201/Slider/hero-3-v1.webp',
+  '/page-section%201/Slider/hero-4-v1.webp',
+  '/page-section%201/Slider/hero-5-v1.webp',
+  '/page-section%201/Slider/hero-6-v1.webp',
+  '/page-section%201/Slider/hero-7-v1.webp',
+  '/page-section%201/Slider/hero-8-v1.webp',
 ];
 
 const HOMEPAGE_IMAGE_URLS = [
@@ -80,8 +80,6 @@ let homepagePreloadPromise: Promise<void> | null = null;
 let homepageProgress = 0;
 const homepageProgressListeners = new Set<(progress: number) => void>();
 
-const IMAGE_PROGRESS_WEIGHT = 38;
-const VIDEO_PROGRESS_WEIGHT = 62;
 const IMAGE_TIMEOUT_MS = 30_000;
 const VIDEO_TIMEOUT_MS = 120_000;
 
@@ -221,49 +219,40 @@ export const preloadHomepageAssets = (onProgress: (progress: number) => void): P
   homepagePreloadPromise = (async () => {
     homepageProgress = 0;
     emitHomepageProgress(1);
-    let completedImages = 0;
+    // The opening hero, header logo and complete scroll video are required
+    // before the first visit can reveal the homepage.
+    const criticalImages = [HERO_URLS[0], '/mahalaxmi-logo-bg.png'];
+    let completed = 0;
     let videoFraction = 0;
-
     const reportProgress = () => {
-      const imageFraction = completedImages / HOMEPAGE_IMAGE_URLS.length;
-      emitHomepageProgress(
-        Math.min(99, 1 + imageFraction * (IMAGE_PROGRESS_WEIGHT - 1) + videoFraction * VIDEO_PROGRESS_WEIGHT),
-      );
+      // Reserve the final percentage point for video readiness and image decode.
+      emitHomepageProgress(Math.min(99, 1 + completed / criticalImages.length * 29 + videoFraction * 69));
     };
-
-    // The video starts first and downloads in parallel with the image queue so
-    // it receives bandwidth throughout the loading-screen experience.
-    const videoTask = preloadScrollVideo((fraction) => {
-      videoFraction = fraction;
-      reportProgress();
-    });
-
-    const imageResults = await Promise.allSettled(
-      HOMEPAGE_IMAGE_URLS.map(async (url) => {
-        try {
-          await decodeImage(url);
-        } finally {
-          completedImages += 1;
-          reportProgress();
-        }
+    await Promise.all([
+      ...criticalImages.map(async (url) => {
+        await decodeImage(url);
+        completed += 1;
+        reportProgress();
       }),
-    );
-    const videoResult = await Promise.allSettled([videoTask]);
-    const failures = [
-      ...imageResults
-        .map((result, index) => ({ result, url: HOMEPAGE_IMAGE_URLS[index] }))
-        .filter(({ result }) => result.status === 'rejected')
-        .map(({ result, url }) => `${url}: ${(result as PromiseRejectedResult).reason}`),
-      ...videoResult
-        .filter((result) => result.status === 'rejected')
-        .map((result) => `${SCROLL_VIDEO_URL}: ${(result as PromiseRejectedResult).reason}`),
-    ];
-
-    if (failures.length > 0) {
-      throw new Error(`Failed to preload ${failures.length} homepage asset(s). ${failures.join(' | ')}`);
-    }
-
+      preloadScrollVideo((fraction) => {
+        videoFraction = fraction;
+        reportProgress();
+      }),
+    ]);
+    // All required assets have completed; optional assets remain in the background.
     emitHomepageProgress(100);
+
+    // The mounted page requests its visible images itself. Warm remaining
+    // assets gradually, without allowing one failure to block the page.
+    const remaining = HOMEPAGE_IMAGE_URLS.filter((url) => !criticalImages.includes(url));
+    let next = 0;
+    const warmImages = async () => {
+      while (next < remaining.length) {
+        const url = remaining[next++];
+        await decodeImage(url).catch(() => {});
+      }
+    };
+    void Promise.all([warmImages(), warmImages(), warmImages()]);
   })().catch((error) => {
     homepagePreloadPromise = null;
     throw error;

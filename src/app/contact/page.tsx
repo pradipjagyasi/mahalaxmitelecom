@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SiteShell from '@/components/SiteShell';
 import styles from './contact.module.css';
 
@@ -10,6 +10,26 @@ export default function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    const prefillEmail = () => {
+      const prefix = '#enquiry-email=';
+      if (!window.location.hash.startsWith(prefix)) return;
+      let email: string;
+      try {
+        email = decodeURIComponent(window.location.hash.slice(prefix.length)).trim();
+      } catch {
+        return;
+      }
+      if (!email || email.length > 254 || /[\r\n]/.test(email)) return;
+      setForm((current) => ({ ...current, email }));
+      window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}#enquiry-form`);
+      requestAnimationFrame(() => document.getElementById('enquiry-form')?.scrollIntoView({ block: 'start' }));
+    };
+    prefillEmail();
+    window.addEventListener('hashchange', prefillEmail);
+    return () => window.removeEventListener('hashchange', prefillEmail);
+  }, []);
 
   const set = (key: keyof typeof form) => (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -61,7 +81,7 @@ export default function ContactPage() {
           <div className={styles.container}>
             <p className={styles.eyebrow}>Contact</p>
             <h1 className={styles.heroTitle}>Let&apos;s talk about <span>your store.</span></h1>
-            <p className={styles.heroDesc}>Tell us about your city, your space and your ambition — we&apos;ll take it from there.</p>
+            <p className={styles.heroDesc}>Tell us about your city, your space and your ambition - we&apos;ll take it from there.</p>
           </div>
         </section>
 
@@ -98,7 +118,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-                <form className={`${styles.formCard} ${styles.areaForm}`} onSubmit={handleSubmit}>
+                <form id="enquiry-form" className={`${styles.formCard} ${styles.areaForm}`} onSubmit={handleSubmit}>
                   <div className={styles.fieldRow}>
                     <div className={styles.field}>
                       <label className={styles.fieldLabel} htmlFor="enquiry-name">Full Name</label>

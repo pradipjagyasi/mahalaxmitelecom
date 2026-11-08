@@ -1,0 +1,106 @@
+/* Shared small-screen refinements for the legal documents. */
+@media screen and (max-width: 700px) {
+  .band {
+    position: relative;
+  }
+
+  .back-contact {
+    top: 16px;
+    left: 16px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .bar {
+    display: block;
+    padding: 18px 20px 0 76px;
+  }
+
+  .brand {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .bar nav {
+    gap: 4px 20px;
+    margin: 12px 0 0 -56px;
+  }
+
+  .bar nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .title {
+    padding: 36px 20px 40px;
+  }
+
+  .title h1 {
+    font-size: clamp(2rem, 8.5vw, 3rem);
+    overflow-wrap: anywhere;
+  }
+
+  .title p {
+    font-size: 1rem;
+  }
+
+  .wrap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 28px 20px 60px;
+  }
+
+  .toc summary {
+    min-height: 44px;
+  }
+
+  .toc a {
+    padding: 10px 0;
+  }
+
+  article, .foot, .glance, .card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  article h2 {
+    font-size: clamp(1.35rem, 5.8vw, 1.6rem);
+  }
+
+  .glance, .card {
+    padding: 18px 20px;
+  }
+
+  .tbl {
+    max-width: 100%;
+  }
+
+  table {
+    min-width: 0;
+    table-layout: fixed;
+    font-size: .9rem;
+    overflow-wrap: anywhere;
+  }
+
+  th, td {
+    padding: 10px 8px;
+  }
+
+  .foot {
+    padding: 32px 20px;
+  }
+
+  footer .links {
+    gap: 8px 20px;
+  }
+
+  footer .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
