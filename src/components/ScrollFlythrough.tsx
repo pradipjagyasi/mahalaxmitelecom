@@ -89,6 +89,8 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
     let primed = false;
     let placed = false;
     let pendingTime: number | null = null;
+    let objectUrl: string | null = null;
+    const loadController = new AbortController();
 
     if (metadataReady) {
       setLoaded(100);
@@ -280,19 +282,34 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
     // remains smooth even though the temporary source video is shorter.
     const videoSrc = '/page-section2/JM%20scrolling-temp-smooth.mp4';
 
-    const loadVideo = () => {
+    const loadVideo = async () => {
       near = true;
       video.preload = 'auto';
-      if (!video.src || (!video.src.endsWith(videoSrc) && video.currentSrc !== videoSrc)) {
+      setLoaded(10);
+
+      try {
+        const response = await fetch(videoSrc, {
+          cache: 'force-cache',
+          signal: loadController.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`Video request failed with status ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        if (loadController.signal.aborted) return;
+
+        objectUrl = URL.createObjectURL(blob);
+        video.src = objectUrl;
+        video.load();
+        onScroll();
+      } catch (error) {
+        if (loadController.signal.aborted) return;
+        console.error('Unable to prepare the showroom video for scrubbing.', error);
         video.src = videoSrc;
         video.load();
-      } else if (video.readyState >= 1) {
-        metadataReady = true;
-        setLoaded(100);
-        setReady(true);
+        onScroll();
       }
-      setLoaded(100);
-      onScroll();
     };
 
     const onMetadata = () => {
@@ -368,6 +385,8 @@ export default function ScrollFlythrough({ embedded = false, takeover = false }:
       video.removeEventListener('loadeddata', onFrame);
       video.removeEventListener('seeked', onSeeked);
       cancelAnimationFrame(raf);
+      loadController.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
       video.pause();
       setSourceHidden(false);
     };
