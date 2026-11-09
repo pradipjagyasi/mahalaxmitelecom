@@ -12,28 +12,28 @@ import { useState } from "react";
 const STORE_TESTIMONIALS = [
   {
     name: "Jagyasi Mobile",
-    role: "Flagship Format — JM",
+    role: "Flagship Format - JM",
     message:
       "Our flagship, company-operated format focused on full-range mobile retail and premium in-store experience.",
     image: "/new-4-stores/Jagyasi%20Mobile.png",
   },
   {
     name: "MM Mobile",
-    role: "Standard Format — MM",
+    role: "Standard Format - MM",
     message:
       "A standard-format store built for consistent, everyday mobile and accessory retail.",
     image: "/new-4-stores/MM%20mobile.png",
   },
   {
     name: "Phone Café",
-    role: "Compact Format — PC",
+    role: "Compact Format - PC",
     message:
       "A compact, neighbourhood-friendly format for accessible mobile shopping.",
     image: "/new-4-stores/Phone%20Cafe.png",
   },
   {
     name: "Mobile Point",
-    role: "Emerging-Market Format — MP",
+    role: "Emerging-Market Format - MP",
     message:
       "A focused retail point for devices and accessories in emerging markets.",
     image: "/new-4-stores/Mobile%20Point.png",
@@ -193,9 +193,10 @@ export default function BrandsPage() {
               trust.
             </h1>
             <p className={styles.heroIntro}>
-              Each brand is built for a different market and store size, and
-              every one of them carries the same sourcing strength, service
-              quality and brand credibility.
+              Jagyasi Mobile, MM Mobile, Phone Café and Mobile Point are the
+              four retail formats of Mahalaxmi Telecom. Each is built for a
+              different market and store size, with the same sourcing strength,
+              service quality and brand credibility.
             </p>
           </div>
         </section>

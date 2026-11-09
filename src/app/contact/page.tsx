@@ -47,8 +47,7 @@ export default function ContactPage() {
     setErrorMessage('');
 
     const scriptUrl =
-      process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL ||
-      'https://script.google.com/macros/s/AKfycbxf8X8r15VHtw46PONkqBRgATQ3im0ATCk6exkE6h3-ekZhbrfo-07-1m4kU7ocsfslpA/exec';
+      'https://script.google.com/macros/s/AKfycbyT5jHdT2nISeUk6vBcRJp-0y-yPdmt4kPhLYoyRha4k5AG-lTLR6LZyLyTMo7cqvd_/exec';
 
     try {
       // Google Apps Script requires text/plain or no-cors with fetch to avoid preflight CORS redirection blocks
@@ -106,7 +105,7 @@ export default function ContactPage() {
                 </div>
                 <div className={styles.cell}>
                   <p className={styles.cellLabel}>Email</p>
-                  <a className={styles.cellValue} href="mailto:mahalaxmitelecom26@gmail.com">mahalaxmitelecom26@gmail.com</a>
+                  <a className={styles.cellValue} href="mailto:contact@mahalaxmitelecom.in">contact@mahalaxmitelecom.in</a>
                 </div>
                 <div className={styles.cell}>
                   <p className={styles.cellLabel}>Website</p>
@@ -167,7 +166,7 @@ export default function ContactPage() {
                       <p className={styles.hint}>Please accept the Terms &amp; Privacy Policy to continue.</p>
                     )}
                     {submitted && (
-                      <p className={styles.success} role="status">Thank you — your enquiry has been received. Our franchise team will get back to you shortly.</p>
+                      <p className={styles.success} role="status">Thank you - your enquiry has been received. Our franchise team will get back to you shortly.</p>
                     )}
                     {errorMessage && (
                       <p className={styles.error} role="alert">{errorMessage}</p>

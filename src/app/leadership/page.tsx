@@ -21,7 +21,7 @@ const DIRECTORS = [
     photo: portrait("1560250097-0b93528c311a"),
     active: true,
     content:
-      "<p>Pradip sets the company’s overall vision and strategy, leading growth, brand partnerships and franchise expansion across Maharashtra and beyond. Every store format — from flagship to neighbourhood retail point — carries his standard of honest advice and hands-on customer experience.</p><p>He comes from more than two decades on the distribution side of telecom, where long-standing relationships with national and global mobile brands were built shelf by shelf. That sourcing strength is what lets every outlet retail with confidence on price, warranty and range.</p>",
+      "<p>Pradip sets the company’s overall vision and strategy, leading growth, brand partnerships and franchise expansion across Maharashtra and beyond. Every store format - from flagship to neighbourhood retail point - carries his standard of honest advice and hands-on customer experience.</p><p>He comes from more than two decades on the distribution side of telecom, where long-standing relationships with national and global mobile brands were built shelf by shelf. That sourcing strength is what lets every outlet retail with confidence on price, warranty and range.</p>",
   },
   {
     id: "GJ",
@@ -32,7 +32,7 @@ const DIRECTORS = [
     photo: portrait("1519085360753-af0119f7cbe7"),
     active: false,
     content:
-      "<p>Gautam runs day-to-day operations across the retail network — store rollouts, staffing, inventory flow and the operating rhythm that keeps every outlet consistent.</p><p>His focus is execution at scale: opening new stores without diluting service quality, and making sure each format runs on the same Mahalaxmi Telecom playbook.</p>",
+      "<p>Gautam runs day-to-day operations across the retail network - store rollouts, staffing, inventory flow and the operating rhythm that keeps every outlet consistent.</p><p>His focus is execution at scale: opening new stores without diluting service quality, and making sure each format runs on the same Mahalaxmi Telecom playbook.</p>",
   },
   {
     id: "NW",
@@ -43,7 +43,7 @@ const DIRECTORS = [
     photo: portrait("1472099645785-5658abf4ff4e"),
     active: false,
     content:
-      "<p>Nilesh oversees finance, commercial discipline and the sourcing engine behind the shelves — the bulk purchasing power and brand relationships built over twenty years of distribution.</p><p>His mandate is simple: better prices for partners, healthy margins for stores, and a supply chain that never leaves a fast-moving product out of stock.</p>",
+      "<p>Nilesh oversees finance, commercial discipline and the sourcing engine behind the shelves - the bulk purchasing power and brand relationships built over twenty years of distribution.</p><p>His mandate is simple: better prices for partners, healthy margins for stores, and a supply chain that never leaves a fast-moving product out of stock.</p>",
   },
   {
     id: "KJ",
@@ -54,7 +54,7 @@ const DIRECTORS = [
     photo: portrait("1507003211169-0a1dd7228f2d"),
     active: false,
     content:
-      "<p>Kapil leads brand partnerships and marketing — from national-device launches to the store-level campaigns and launch support every new franchise receives.</p><p>He owns the look, voice and visibility of the network, so a customer walking into any of the four formats instantly recognises the same trusted standard.</p>",
+      "<p>Kapil leads brand partnerships and marketing - from national-device launches to the store-level campaigns and launch support every new franchise receives.</p><p>He owns the look, voice and visibility of the network, so a customer walking into any of the four formats instantly recognises the same trusted standard.</p>",
   },
   {
     id: "VJ",
@@ -65,7 +65,7 @@ const DIRECTORS = [
     photo: portrait("1500648767791-00dcc994a43e"),
     active: false,
     content:
-      "<p>Vijay champions franchise partner success — onboarding, training, finance options and the ongoing support that turns a new store into a thriving local business.</p><p>From site selection to grand opening and beyond, his team stands behind every partner with hands-on guidance, not just a brand board.</p>",
+      "<p>Vijay champions franchise partner success - onboarding, training, finance options and the ongoing support that turns a new store into a thriving local business.</p><p>From site selection to grand opening and beyond, his team stands behind every partner with hands-on guidance, not just a brand board.</p>",
   },
 ];
 
@@ -154,7 +154,7 @@ export default function LeadershipPage() {
                         href="#"
                         onClick={(event) => { event.preventDefault(); openProfile(d.id); }}
                         className={styles.cardLink}
-                      >— Profile</a>
+                      >- Profile</a>
                     </div>
                   ))}
                 </div>

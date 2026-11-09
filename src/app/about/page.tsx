@@ -160,7 +160,7 @@ export default function AboutPage() {
               </h2>
               <p className={styles.storyBody}>
                 Our stores give customers something an online listing never can
-                — the chance to hold every device, test every camera and compare
+                - the chance to hold every device, test every camera and compare
                 every display before spending a rupee. That physical confidence
                 is what keeps customers choosing our stores and our partner
                 franchisees thriving.

@@ -11,10 +11,11 @@ const siteDescription =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Mahalaxmi Telecom | Multi-Brand Mobile Retail & Franchise',
+    default: 'Mahalaxmi Telecom | Mobile Stores & Franchise in Maharashtra',
     template: '%s | Mahalaxmi Telecom',
   },
   description: siteDescription,
+  alternates: { canonical: '/' },
   applicationName: siteName,
   keywords: [
     'Mahalaxmi Telecom',
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     url: siteUrl,
     siteName,
-    title: 'Mahalaxmi Telecom | Multi-Brand Mobile Retail & Franchise',
+    title: 'Mahalaxmi Telecom | Mobile Stores & Franchise in Maharashtra',
     description: siteDescription,
     images: [
       {
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mahalaxmi Telecom | Multi-Brand Mobile Retail & Franchise',
+    title: 'Mahalaxmi Telecom | Mobile Stores & Franchise in Maharashtra',
     description: siteDescription,
     images: ['/mahalaxmi-banner-logo.jpg'],
   },
@@ -89,7 +90,7 @@ export default function RootLayout({
         image: `${siteUrl}/mahalaxmi-banner-logo.jpg`,
         description: siteDescription,
         telephone: '+91-96048-36936',
-        email: 'mahalaxmitelecom26@gmail.com',
+        email: 'contact@mahalaxmitelecom.in',
         priceRange: '₹₹',
         address: {
           '@type': 'PostalAddress',

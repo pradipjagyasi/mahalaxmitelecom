@@ -30,13 +30,13 @@ const frameFloatFromP = (p: number, count: number) => {
 };
 
 const BEATS = [
-  { eyebrow: 'From the street', title: 'It starts outside.', body: 'Jagyasi Mobiles by Mahalaxmi Telecom — evening lights on, doors open.', tags: ['Flagship Store', 'Nandurbar'] },
+  { eyebrow: 'From the street', title: 'It starts outside.', body: 'Jagyasi Mobiles by Mahalaxmi Telecom - evening lights on, doors open.', tags: ['Flagship Store', 'Nandurbar'] },
   /*
-  { eyebrow: 'Step closer', title: 'Glass doors, warm light.', body: 'Keep scrolling — the camera glides straight through the entrance.', tags: ['Physical-first'] },
+  { eyebrow: 'Step closer', title: 'Glass doors, warm light.', body: 'Keep scrolling - the camera glides straight through the entrance.', tags: ['Physical-first'] },
   */
-  { eyebrow: 'Inside the showroom', title: 'Every screen, live.', body: 'Samsung, LG, Sony walls — test everything before you buy.', tags: ['Samsung', 'LG', 'Sony'] },
+  { eyebrow: 'Inside the showroom', title: 'Every screen, live.', body: 'Samsung, LG, Sony walls - test everything before you buy.', tags: ['Samsung', 'LG', 'Sony'] },
   /*
-  { eyebrow: 'Take your time', title: 'Sit. Compare. Decide.', body: 'Lounge seating, honest advice, no rush — this is retail that breathes.', tags: ['Hands-on', 'No Targets'] },
+  { eyebrow: 'Take your time', title: 'Sit. Compare. Decide.', body: 'Lounge seating, honest advice, no rush - this is retail that breathes.', tags: ['Hands-on', 'No Targets'] },
   */
   { eyebrow: 'Your turn', title: 'Come walk it for real.', body: 'Or bring this trusted format to your town as a franchise partner.', tags: [], cta: true },
 ];

@@ -241,7 +241,7 @@ export default function FranchisePage() {
             <div className={styles.planRow}>
               <div>
                 <p className={styles.planRowEyebrow}>Store Size & Investment</p>
-                <h3 className={styles.planValue}>{"\u20B915\u201350 Lakh"}</h3>
+                <h3 className={styles.planValue}>{"\u20B915-50 Lakh"}</h3>
               </div>
               <p className={styles.planDesc}>
                 Stores range from 300 to 1000 sq ft, with an investment of
@@ -252,7 +252,7 @@ export default function FranchisePage() {
             <div className={styles.planRow}>
               <div>
                 <p className={styles.planRowEyebrow}>Operation & ROI</p>
-                <h3 className={styles.planValue}>12{"\u2013"}15 Months</h3>
+                <h3 className={styles.planValue}>12-15 Months</h3>
               </div>
               <p className={styles.planDesc}>
                 Each store typically needs two to three employees. The payback
@@ -358,7 +358,7 @@ export default function FranchisePage() {
           >
             <div className={businessStyles.businessContainer}>
               <p className={businessStyles.businessSectionLabel}>
-                01 {"\u2014"} What we are
+                01 - What we are
               </p>
               <div className={businessStyles.businessPillars}>
                 <article className={businessStyles.businessPillar}>
@@ -444,7 +444,7 @@ export default function FranchisePage() {
           >
             <div className={businessStyles.businessContainer}>
               <p className={businessStyles.businessSectionLabel}>
-                02 {"\u2014"} What we offer
+                02 - What we offer
               </p>
               <h2 className={businessStyles.businessSectionTitle}>
                 Our retail ecosystem.
@@ -476,7 +476,7 @@ export default function FranchisePage() {
           >
             <div className={businessStyles.businessContainer}>
               <p className={businessStyles.businessSectionLabel}>
-                03 {"\u2014"} How we scale
+                03 - How we scale
               </p>
               <h2 className={businessStyles.businessSectionTitleLight}>
                 Central expertise, local entrepreneurship.
@@ -485,7 +485,7 @@ export default function FranchisePage() {
                 <article className={businessStyles.businessScaleCard}>
                   <h3>Company-Owned Stores</h3>
                   <p>
-                    Flagships run directly by Mahalaxmi Telecom {"\u2014"} the
+                    Flagships run directly by Mahalaxmi Telecom - the
                     standard-setters.
                   </p>
                 </article>
@@ -518,7 +518,7 @@ export default function FranchisePage() {
           >
             <div className={businessStyles.businessContainer}>
               <p className={businessStyles.businessSectionLabel}>
-                04 {"\u2014"} What connects it all
+                04 - What connects it all
               </p>
               <h2 className={businessStyles.businessSectionTitle}>
                 Built around the customer.

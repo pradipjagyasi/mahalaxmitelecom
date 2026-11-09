@@ -288,8 +288,8 @@ export default function SiteShell({
                 <a href="tel:+919604836936">+91 96048 36936</a>
               </li>
               <li>
-                <a href="mailto:mahalaxmitelecom26@gmail.com">
-                  mahalaxmitelecom26@gmail.com
+                <a href="mailto:contact@mahalaxmitelecom.in">
+                  contact@mahalaxmitelecom.in
                 </a>
               </li>
             </ul>
