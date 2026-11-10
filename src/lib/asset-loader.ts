@@ -38,7 +38,7 @@ const HERO_URLS = [
 const HOMEPAGE_IMAGE_URLS = [
   ...HERO_URLS,
   '/images/home/flythrough/poster-desktop.webp',
-  '/images/home/flythrough/poster-mobile.webp',
+  '/images/home/flythrough/poster-mobile-v2.webp',
   '/images/home/store-formats/Jagyasi%20Mobile.webp',
   '/images/home/store-formats/MM%20mobile.webp',
   '/images/home/store-formats/Phone%20Cafe.webp',

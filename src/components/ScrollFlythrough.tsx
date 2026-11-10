@@ -685,7 +685,7 @@ export default function ScrollFlythrough({ embedded = false, takeover = false, e
   }, [embedded, takeover, engineMode]);
   */
 
-  const posterSrc = isMobile ? '/images/home/flythrough/poster-mobile.webp' : '/images/home/flythrough/poster-desktop.webp';
+  const posterSrc = isMobile ? '/images/home/flythrough/poster-mobile-v2.webp' : '/images/home/flythrough/poster-desktop.webp';
 
   /*
   const renderEngineControls = () => (
@@ -784,9 +784,6 @@ export default function ScrollFlythrough({ embedded = false, takeover = false, e
               ))}
             </div>
             <div ref={copyRef} className={styles.copy} style={isMobile ? { opacity: 1, pointerEvents: 'auto' } : { opacity: 0 }}>
-              <p className={styles.kicker}>
-                Video Mode (SMOOTH) · {loaded}% ready
-              </p>
               {BEATS.map((b, i) => (
                 <div key={b.title} className={i === active ? styles.beatOn : styles.beat}>
                   <p className={styles.eyebrow}>{b.eyebrow}</p>
@@ -840,9 +837,6 @@ export default function ScrollFlythrough({ embedded = false, takeover = false, e
           ))}
         </div>
         <div className={styles.copy}>
-          <p className={styles.kicker}>
-            Video Mode (SMOOTH) · {loaded}% ready
-          </p>
           {BEATS.map((b, i) => (
             <div key={b.title} className={i === active ? styles.beatOn : styles.beat}>
               <p className={styles.eyebrow}>{b.eyebrow}</p>

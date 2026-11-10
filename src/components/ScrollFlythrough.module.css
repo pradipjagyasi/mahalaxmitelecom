@@ -147,13 +147,6 @@
   padding: 0 clamp(20px, 6vw, 88px) calc(28px + env(safe-area-inset-bottom));
   pointer-events: none;
 }
-.kicker {
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  opacity: 0.75;
-  margin: 0 0 10px;
-}
 .beat {
   display: none;
 }
@@ -270,6 +263,18 @@
     transform: translateY(0) !important;
   }
 }
+@media (max-width: 860px) {
+  .takeoverSticky {
+    top: 82px;
+    height: calc(100dvh - 82px);
+  }
+}
+@media (min-width: 861px) and (max-width: 1100px) {
+  .takeoverSticky {
+    top: 108px;
+    height: calc(100dvh - 108px);
+  }
+}
 @media (max-width: 767px) {
   .takeoverWrap,
   .wrap {
@@ -318,7 +323,7 @@
   .poster,
   .mobileVideo,
   .stageVideo {
-    height: max(280px, calc(100dvh - 363px));
+    height: max(220px, calc(100dvh - 445px));
     object-fit: cover;
   }
 }

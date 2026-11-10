@@ -217,7 +217,12 @@ export function TeamDrawer({
               <p className={styles.role}>{renderMember.teams.designation}</p>
               {featuredImageSource && (
                 <div className={styles.photo}>
-                  <img src={featuredImageSource} alt={`${renderMember.title} portrait`} loading="lazy" />
+                  <img
+                    src={featuredImageSource}
+                    alt={`${renderMember.title} portrait`}
+                    loading="lazy"
+                    fetchPriority="low"
+                  />
                 </div>
               )}
               <div className={styles.bio} dangerouslySetInnerHTML={{ __html: renderMember.content }} />

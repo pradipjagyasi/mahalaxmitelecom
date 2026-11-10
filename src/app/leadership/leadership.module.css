@@ -1,7 +1,7 @@
 .topSection {
   background: #f5f1eb;
   border-bottom: 1px solid #ece7dd;
-  padding: 88px 0 84px;
+  padding: 88px 0 8px;
 }
 .topContainer {
   width: min(100% - 64px, 1280px);
