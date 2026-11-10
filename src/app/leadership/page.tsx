@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SiteShell from "@/components/SiteShell";
 import {
   TeamDrawer,
@@ -78,6 +78,120 @@ const TEAM: TeamMember[] = DIRECTORS.map((d) => ({
 export default function LeadershipPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selected, setSelected] = useState<TeamMember | null>(null);
+  const boardSectionRef = useRef<HTMLElement>(null);
+  const stripScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const section = boardSectionRef.current;
+    const scroller = stripScrollRef.current;
+    if (!section || !scroller) return;
+    const stickyContainer = scroller.parentElement;
+    if (!stickyContainer) return;
+
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+    let animationFrame = 0;
+    let journeyStart = 0;
+    let horizontalTravel = 0;
+    let pinnedTravel = 0;
+    let pinTop = 0;
+
+    const resetPinnedStyles = () => {
+      scroller.style.removeProperty("position");
+      scroller.style.removeProperty("top");
+      scroller.style.removeProperty("left");
+      scroller.style.removeProperty("width");
+      scroller.style.removeProperty("z-index");
+    };
+
+    const updateHorizontalPosition = () => {
+      animationFrame = 0;
+      if (!mobileQuery.matches || horizontalTravel <= 0) return;
+
+      const elapsed = window.scrollY - journeyStart;
+      const progress = Math.min(horizontalTravel, Math.max(0, elapsed));
+
+      if (elapsed <= 0) {
+        resetPinnedStyles();
+      } else if (elapsed < pinnedTravel) {
+        const pinRect = stickyContainer.getBoundingClientRect();
+        scroller.style.position = "fixed";
+        scroller.style.top = `${pinTop}px`;
+        scroller.style.left = `${pinRect.left}px`;
+        scroller.style.width = `${stickyContainer.clientWidth}px`;
+        scroller.style.zIndex = "2";
+      } else {
+        scroller.style.position = "absolute";
+        scroller.style.top = `${pinnedTravel}px`;
+        scroller.style.left = "0";
+        scroller.style.width = "100%";
+        scroller.style.zIndex = "2";
+      }
+
+      if (Math.abs(scroller.scrollLeft - progress) > 0.5) {
+        scroller.scrollLeft = progress;
+      }
+    };
+
+    const requestPositionUpdate = () => {
+      if (animationFrame) return;
+      animationFrame = window.requestAnimationFrame(updateHorizontalPosition);
+    };
+
+    const measureJourney = () => {
+      if (!mobileQuery.matches) {
+        horizontalTravel = 0;
+        section.style.removeProperty("--board-scroll-distance");
+        section.style.removeProperty("--board-card-height");
+        resetPinnedStyles();
+        scroller.scrollLeft = 0;
+        return;
+      }
+
+      horizontalTravel = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+      pinnedTravel = horizontalTravel + Math.round(window.innerHeight * 0.65);
+      section.style.setProperty(
+        "--board-scroll-distance",
+        `${pinnedTravel}px`,
+      );
+      section.style.setProperty("--board-card-height", `${scroller.offsetHeight}px`);
+
+      let offsetWithinSection = 0;
+      let currentElement: HTMLElement | null = stickyContainer;
+      while (currentElement && currentElement !== section) {
+        offsetWithinSection += currentElement.offsetTop;
+        currentElement = currentElement.offsetParent as HTMLElement | null;
+      }
+
+      const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+      pinTop =
+        Number.parseFloat(
+          window
+            .getComputedStyle(section)
+            .getPropertyValue("--board-pin-top"),
+        ) || 0;
+      journeyStart = sectionTop + offsetWithinSection - pinTop;
+      requestPositionUpdate();
+    };
+
+    const resizeObserver = new ResizeObserver(measureJourney);
+    resizeObserver.observe(section);
+    resizeObserver.observe(scroller);
+    mobileQuery.addEventListener("change", measureJourney);
+    window.addEventListener("scroll", requestPositionUpdate, { passive: true });
+    window.addEventListener("resize", measureJourney, { passive: true });
+    measureJourney();
+
+    return () => {
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+      mobileQuery.removeEventListener("change", measureJourney);
+      window.removeEventListener("scroll", requestPositionUpdate);
+      window.removeEventListener("resize", measureJourney);
+      section.style.removeProperty("--board-scroll-distance");
+      section.style.removeProperty("--board-card-height");
+      resetPinnedStyles();
+    };
+  }, []);
 
   const openProfile = (id: string) => {
     const member = TEAM.find((t) => t.id === id);
@@ -191,13 +305,14 @@ export default function LeadershipPage() {
 
 
 
-<section className={styles.boardSection}>
+        <section ref={boardSectionRef} className={styles.boardSection}>
           <div className={styles.boardContainer}>
             <p className={styles.eyebrow}>Board & Leadership</p>
             <h2 className={styles.boardTitle}>Five directors, one shared standard of retail.</h2>
 
-            <div className={styles.stripScroll}>
-              <div className={styles.strip}>
+            <div className={styles.stripPin}>
+              <div ref={stripScrollRef} className={styles.stripScroll}>
+                <div className={styles.strip}>
                 <div className={styles.headRow}>
                   {DIRECTORS.map(d => (
                     <div key={d.id} className={styles.headCell}>
@@ -240,6 +355,7 @@ export default function LeadershipPage() {
                       >&mdash; Profile</a>
                     </div>
                   ))}
+                </div>
                 </div>
               </div>
             </div>

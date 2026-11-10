@@ -141,8 +141,10 @@
 .cardLinkMuted {
   color: #9a9590;
 }
-.stripScroll {
+.stripPin {
   margin-top: 48px;
+}
+.stripScroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -228,6 +230,92 @@
 .footCell .cardLink {
   margin-top: 0;
 }
+
+@media (max-width: 767px) {
+  .boardSection {
+    --board-scroll-distance: 0px;
+    --board-card-height: 548px;
+    --board-pin-top: 98px;
+    position: relative;
+    padding-bottom: 32px;
+  }
+
+  .boardContainer {
+    width: calc(100% - 32px);
+  }
+
+  .stripPin {
+    position: relative;
+    z-index: 1;
+    height: calc(var(--board-card-height) + var(--board-scroll-distance));
+  }
+
+  .stripScroll {
+    position: relative;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .stripScroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .strip {
+    width: max-content;
+    min-width: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .headRow,
+  .photoRow,
+  .footRow {
+    display: flex;
+    width: max-content;
+    gap: 12px;
+    border: 0;
+    background: transparent;
+  }
+
+  .headCell,
+  .photoCell,
+  .footCell {
+    box-sizing: border-box;
+    flex: 0 0 calc(100vw - 32px);
+    border-left: 0;
+  }
+
+  .headCell {
+    padding: 30px 22px 26px;
+    border: 1px solid #e8e2d6;
+    border-bottom: 0;
+    border-radius: 16px 16px 0 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .photoCell {
+    height: clamp(320px, 56vh, 430px);
+    aspect-ratio: auto;
+    border-right: 1px solid #e8e2d6;
+    border-left: 1px solid #e8e2d6;
+  }
+
+  .photoCell img {
+    object-position: center top;
+  }
+
+  .footCell {
+    border: 1px solid #e8e2d6;
+    border-top: 0;
+    border-radius: 0 0 16px 16px;
+  }
+}
+
 @media (max-width: 980px) {
   .grid {
     grid-template-columns: 1fr 1fr;

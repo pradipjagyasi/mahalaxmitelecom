@@ -6,10 +6,10 @@ import SiteShell from "@/components/SiteShell";
 import { InfiniteSlider } from "@/components/InfiniteSlider";
 import ScrollFlythrough from "@/components/ScrollFlythrough";
 import { Typewriter } from "@/components/ui/typewriter-text";
-import LoadingScreen from "@/components/ui/LoadingScreen";
-import {
-  preloadHomepageAssets,
-} from "@/lib/asset-loader";
+// Loading screen intentionally disconnected. Keep these imports available for
+// a future restoration of the asset-preload gate.
+// import LoadingScreen from "@/components/ui/LoadingScreen";
+// import { preloadHomepageAssets } from "@/lib/asset-loader";
 import styles from "./page.module.css";
 
 const heroImages = [
@@ -52,9 +52,10 @@ const suppliedUnsplashPhotos: Record<string, string> = {
 const unsplashDownload = (photo: string) =>
   unsplash(suppliedUnsplashPhotos[photo] ?? photo);
 
-const HOMEPAGE_VISITED_KEY = "mahalaxmi-homepage-ready-v1";
+// const HOMEPAGE_VISITED_KEY = "mahalaxmi-homepage-ready-v1";
 
 export default function Home() {
+  /* Loading screen intentionally disconnected.
   const [loadProgress, setLoadProgress] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -102,9 +103,11 @@ export default function Home() {
     }
     setRevealed(true);
   }, []);
+  */
 
   return (
     <>
+      {/* Loading screen intentionally disconnected.
       {!revealed && (
         <LoadingScreen
           progress={loadProgress}
@@ -113,6 +116,7 @@ export default function Home() {
           onContinue={() => setRevealed(true)}
         />
       )}
+      */}
         <SiteShell transparentOnTop>
           <main id="main-content">
           <section id="hero" className={styles.heroSection}>
@@ -486,7 +490,7 @@ export default function Home() {
                 />
               </div>
             </div>
-            <ScrollFlythrough takeover enabled={revealed} />
+            <ScrollFlythrough takeover />
           </section>
           </main>
           <StoreOutletBrandsSection />
