@@ -107,7 +107,7 @@ export default function SiteShell({
           >
             <span className="brand-name">
               <img
-                src="/mahalaxmi-logo-bg.png"
+                src="/images/global/mahalaxmi-logo-bg.webp"
                 alt=""
                 className="brand-logo-mark"
               />
@@ -158,7 +158,7 @@ export default function SiteShell({
 
           <a href="tel:+918484840984" className="nav-cta-btn" aria-label="Call for enquiry">
             <img
-              src="/icons/call.svg"
+              src="/images/global/icons/call.svg"
               alt=""
               className="nav-cta-icon"
               aria-hidden="true"
@@ -198,7 +198,7 @@ export default function SiteShell({
               aria-label="Mahalaxmi Telecom home"
             >
               <img
-                src="/mahalaxmi-logo-bg.png"
+                src="/images/global/mahalaxmi-logo-bg.webp"
                 alt=""
                 className="footer-logo-img"
                 aria-hidden="true"

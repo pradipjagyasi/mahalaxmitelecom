@@ -19,34 +19,34 @@ interface FrameManifest {
 }
 
 const CACHE_NAME = 'mahalaxmi-flythrough-hd-v1';
-const MANIFEST_URL = '/page-section2/hires/manifest.json';
-const FRAME_BASE = '/page-section2/hires/';
-const LOGO_URL = '/mahalaxmi-logo.png';
-export const SCROLL_VIDEO_URL = '/page-section2/JM%20scrolling-temp-smooth.mp4';
+const MANIFEST_URL = '/images/home/flythrough/hires/manifest.json';
+const FRAME_BASE = '/images/home/flythrough/hires/';
+const LOGO_URL = '/images/global/mahalaxmi-logo.webp';
+export const SCROLL_VIDEO_URL = '/images/home/flythrough/JM%20scrolling-temp-smooth.mp4';
 export const ZERO_URL = `${FRAME_BASE}frame-000.webp`;
 const HERO_URLS = [
-  '/page-section%201/Slider/hero-1-v1.webp',
-  '/page-section%201/Slider/hero-2-v1.webp',
-  '/page-section%201/Slider/hero-3-v1.webp',
-  '/page-section%201/Slider/hero-4-v1.webp',
-  '/page-section%201/Slider/hero-5-v1.webp',
-  '/page-section%201/Slider/hero-6-v1.webp',
-  '/page-section%201/Slider/hero-7-v1.webp',
-  '/page-section%201/Slider/hero-8-v1.webp',
+  '/images/home/hero/hero-1-v1.webp',
+  '/images/home/hero/hero-2-v1.webp',
+  '/images/home/hero/hero-3-v1.webp',
+  '/images/home/hero/hero-4-v1.webp',
+  '/images/home/hero/hero-5-v1.webp',
+  '/images/home/hero/hero-6-v1.webp',
+  '/images/home/hero/hero-7-v1.webp',
+  '/images/home/hero/hero-8-v1.webp',
 ];
 
 const HOMEPAGE_IMAGE_URLS = [
   ...HERO_URLS,
-  '/page-section2/poster-desktop.jpg',
-  '/page-section2/poster-mobile.jpg',
-  '/landing-stores/Jagyasi%20Mobile.png',
-  '/landing-stores/MM%20mobile.png',
-  '/landing-stores/Phone%20Cafe.png',
-  '/landing-stores/Mobile%20Point.png',
-  '/mahalaxmi-logo.png',
-  '/mahalaxmi-logo-bg.png',
-  '/footer-store.jpg',
-  '/icons/call.svg',
+  '/images/home/flythrough/poster-desktop.webp',
+  '/images/home/flythrough/poster-mobile.webp',
+  '/images/home/store-formats/Jagyasi%20Mobile.webp',
+  '/images/home/store-formats/MM%20mobile.webp',
+  '/images/home/store-formats/Phone%20Cafe.webp',
+  '/images/home/store-formats/Mobile%20Point.webp',
+  '/images/global/mahalaxmi-logo.webp',
+  '/images/global/mahalaxmi-logo-bg.webp',
+  '/images/global/footer-store.webp',
+  '/images/global/icons/call.svg',
   'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=70&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1646861039459-fd9e3aabf3fb?w=600&q=70&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600&q=70&auto=format&fit=crop',
@@ -221,7 +221,7 @@ export const preloadHomepageAssets = (onProgress: (progress: number) => void): P
     emitHomepageProgress(1);
     // The opening hero, header logo and complete scroll video are required
     // before the first visit can reveal the homepage.
-    const criticalImages = [HERO_URLS[0], '/mahalaxmi-logo-bg.png'];
+    const criticalImages = [HERO_URLS[0], '/images/global/mahalaxmi-logo-bg.webp'];
     let completed = 0;
     let videoFraction = 0;
     const reportProgress = () => {

@@ -323,7 +323,7 @@ export default function FranchisePage() {
             </div>
             <div className={styles.howImageWrap}>
               <img
-                src="/page-section1/hero-store.jpg"
+                src="/images/franchise/hero-store.webp"
                 alt="Premium store interior"
                 className={styles.howImage}
               />

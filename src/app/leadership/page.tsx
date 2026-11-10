@@ -163,6 +163,82 @@ export default function LeadershipPage() {
           </div>
         </section> */}
 
+        
+        <section
+          id="directors-message"
+          className={styles.messageSection}
+          aria-label="Message from the CEO"
+        >
+          <div className={styles.messageContainer}>
+            <div className={styles.messageCopy}>
+              <p className={styles.eyebrow}>Director&apos;s Message</p>
+              <h2 className={styles.messageName}>Pradip Jagyasi</h2>
+              <p className={styles.messageRole}>
+                CEO &amp; Co-Founder <span aria-hidden="true">✦</span>
+              </p>
+              <blockquote className={styles.messageQuote}>
+                Throughout my career, I have learned that the most valuable
+                <em> investment</em> we make is not financial. Our greatest
+                return is the <em>power of the connections</em> we forge and the{" "}
+                <em>network</em> we build.
+              </blockquote>
+              <p className={styles.messageSign}>
+                Mahalaxmi Telecom Private Limited
+              </p>
+            </div>
+            <div className={styles.messageMedia}>
+              {/* <span className={styles.messageInitial} aria-hidden="true">
+                Pradip
+              </span> */}
+              <img
+                src="/images/leadership/CEO.png"
+                alt="Pradip Jagyasi, CEO & Co-Founder"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section
+          className={styles.gautamSection}
+          aria-labelledby="gautam-message-title"
+        >
+          <div className={styles.gautamContainer}>
+            <div className={styles.gautamMedia}>
+              <img src="/images/leadership/Director.png" alt="Portrait placeholder for Gautam Jagyasi, Managing Director" loading="lazy"/>
+            </div>
+
+            <div className={styles.gautamCopy}>
+              <h2 id="gautam-message-title" className={styles.gautamName}>
+                Gautam Jagyasi
+              </h2>
+              <div className={styles.gautamMeta}>
+                <p className={styles.gautamRole}>Managing Director</p>
+                <p className={styles.gautamPerspective}>
+                  Leadership perspective
+                </p>
+              </div>
+              <blockquote className={styles.gautamQuote}>
+                A vision becomes meaningful only when it is{" "}
+                <em>delivered consistently</em>-through every store, every team,
+                and every <em>customer experience</em>.
+              </blockquote>
+              <p className={styles.gautamStatement}>
+                We grow by turning ambition into a{" "}
+                <strong>dependable operating standard</strong>: disciplined
+                execution, empowered teams, and the same{" "}
+                <strong>trusted experience</strong> wherever our customers meet
+                us.
+              </p>
+              <p className={styles.gautamSign}>
+                Mahalaxmi Telecom Private Limited
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+
         <section
           aria-label="Leadership team"
           style={{
@@ -180,51 +256,7 @@ export default function LeadershipPage() {
               minWidth: "1060px",
             }}
           >
-            <div
-              style={{
-                flex: "1 1 0",
-                minWidth: "244px",
-                padding: "32px 28px",
-                background: "#fffdfa",
-                border: "1px solid #e8e2d6",
-                borderRadius: "14px",
-                boxSizing: "border-box",
-              }}
-            >
-              <h3
-                style={{
-                  margin: 0,
-                  color: "#c19a5f",
-                  fontSize: "25px",
-                  fontWeight: 700,
-                }}
-              >
-                Gautam Jagyasi
-              </h3>
-              <p
-                style={{
-                  margin: "8px 0 0",
-                  color: "#8a8580",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  letterSpacing: "1.6px",
-                  textTransform: "uppercase",
-                }}
-              >
-                Managing Director
-              </p>
-              <p
-                style={{
-                  margin: "16px 0 0",
-                  color: "#6b6560",
-                  fontSize: "12.5px",
-                  lineHeight: 1.65,
-                }}
-              >
-                Gautam Jagyasi is the Managing Director of Mahalaxmi Telecom
-                Private Limited.
-              </p>
-            </div>
+
             <div
               style={{
                 flex: "1 1 0",
@@ -363,39 +395,8 @@ export default function LeadershipPage() {
           </div>
         </section>
 
-        <section
-          id="directors-message"
-          className={styles.messageSection}
-          aria-label="Message from the CEO"
-        >
-          <div className={styles.messageContainer}>
-            <div className={styles.messageCopy}>
-              <p className={styles.eyebrow}>Director&apos;s Message</p>
-              <h2 className={styles.messageName}>Pradip Jagyasi</h2>
-              <p className={styles.messageRole}>
-                CEO &amp; Co-Founder <span aria-hidden="true">✦</span>
-              </p>
-              <blockquote className={styles.messageQuote}>
-                Throughout my career, I have learned that the most valuable
-               <em> investment</em> we make is not financial. Our greatest return is the <em>power of the connections</em> we forge and the <em>network</em> we build.
-              </blockquote>
-              <p className={styles.messageSign}>
-                Mahalaxmi Telecom Private Limited
-              </p>
-            </div>
-            <div className={styles.messageMedia}>
-              {/* <span className={styles.messageInitial} aria-hidden="true">
-                Pradip
-              </span> */}
-              <img
-                src="Leadership/CEO.png"
-                alt="Pradip Jagyasi, CEO & Co-Founder"
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </section>
       </main>
+
       <TeamDrawer
         open={drawerOpen}
         member={selected}

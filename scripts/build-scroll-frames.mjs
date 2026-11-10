@@ -7,7 +7,7 @@ import sharp from 'sharp';
 
 const root = process.cwd();
 const source = path.join(root, 'JM Scrolling video.mp4');
-const output = path.join(root, 'public', 'page-section2', 'hires');
+const output = path.join(root, 'public', 'images', 'home', 'flythrough', 'hires');
 const ffmpeg = process.env.FFMPEG_PATH || 'ffmpeg';
 
 await mkdir(output, { recursive: true });

@@ -685,7 +685,7 @@ export default function ScrollFlythrough({ embedded = false, takeover = false, e
   }, [embedded, takeover, engineMode]);
   */
 
-  const posterSrc = isMobile ? '/page-section2/poster-mobile.jpg' : '/page-section2/poster-desktop.jpg';
+  const posterSrc = isMobile ? '/images/home/flythrough/poster-mobile.webp' : '/images/home/flythrough/poster-desktop.webp';
 
   /*
   const renderEngineControls = () => (

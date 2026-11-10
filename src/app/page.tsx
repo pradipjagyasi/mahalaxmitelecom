@@ -13,14 +13,14 @@ import {
 import styles from "./page.module.css";
 
 const heroImages = [
-  "/page-section%201/Slider/hero-1-v1.webp",
-  "/page-section%201/Slider/hero-2-v1.webp",
-  "/page-section%201/Slider/hero-3-v1.webp",
-  "/page-section%201/Slider/hero-4-v1.webp",
-  "/page-section%201/Slider/hero-5-v1.webp",
-  "/page-section%201/Slider/hero-6-v1.webp",
-  "/page-section%201/Slider/hero-7-v1.webp",
-  "/page-section%201/Slider/hero-8-v1.webp",
+  "/images/home/hero/hero-1-v1.webp",
+  "/images/home/hero/hero-2-v1.webp",
+  "/images/home/hero/hero-3-v1.webp",
+  "/images/home/hero/hero-4-v1.webp",
+  "/images/home/hero/hero-5-v1.webp",
+  "/images/home/hero/hero-6-v1.webp",
+  "/images/home/hero/hero-7-v1.webp",
+  "/images/home/hero/hero-8-v1.webp",
 ];
 
 const unsplash = (id: string) =>
@@ -481,7 +481,7 @@ export default function Home() {
                 {/* The old frame-000.webp still is retained in asset-loader.ts
                     for recovery, but is not loaded in the active video flow. */}
                 <img
-                  src="/page-section2/poster-desktop.jpg"
+                  src="/images/home/flythrough/poster-desktop.webp"
                   alt="Jagyasi Mobiles storefront powered by Mahalaxmi Telecom"
                 />
               </div>
@@ -543,7 +543,7 @@ const outletBrands = [
     name: "Jagyasi Mobile",
     description:
       "Our flagship, company-operated format focused on full-range mobile retail and premium in-store experience.",
-    image: "/landing-stores/Jagyasi%20Mobile.png",
+    image: "/images/home/store-formats/Jagyasi%20Mobile.webp",
   },
   {
     id: "mm",
@@ -551,7 +551,7 @@ const outletBrands = [
     name: "MM Mobile",
     description:
       "A standard-format store built for consistent, everyday mobile and accessory retail.",
-    image: "/landing-stores/MM%20mobile.png",
+    image: "/images/home/store-formats/MM%20mobile.webp",
   },
   {
     id: "pc",
@@ -559,7 +559,7 @@ const outletBrands = [
     name: "Phone Cafe",
     description:
       "A compact, neighbourhood-friendly format for accessible mobile shopping.",
-    image: "/landing-stores/Phone%20Cafe.png",
+    image: "/images/home/store-formats/Phone%20Cafe.webp",
   },
   {
     id: "mp",
@@ -567,7 +567,7 @@ const outletBrands = [
     name: "Mobile Point",
     description:
       "A focused retail point for devices and accessories in emerging markets.",
-    image: "/landing-stores/Mobile%20Point.png",
+    image: "/images/home/store-formats/Mobile%20Point.webp",
   },
 ];
 
@@ -975,13 +975,20 @@ function TypewriterHero() {
       <span aria-hidden="true">{HERO_LINE_1}</span>
       <br />
       <span className={styles.heroTitleAccent} aria-hidden="true">
-        <Typewriter
-          text={HERO_LINES_2}
-          speed={HERO_SPEED}
-          loop
-          deleteSpeed={25}
-          delay={2000}
-        />
+        {HERO_LINES_2.map((line) => (
+          <span key={line} className={styles.heroTitleReserve}>
+            {line}
+          </span>
+        ))}
+        <span className={styles.heroTitleAnimated}>
+          <Typewriter
+            text={HERO_LINES_2}
+            speed={HERO_SPEED}
+            loop
+            deleteSpeed={25}
+            delay={2000}
+          />
+        </span>
       </span>
     </span>
   );

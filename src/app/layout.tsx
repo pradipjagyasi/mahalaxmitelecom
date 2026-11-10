@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: '/mahalaxmi-banner-logo.jpg',
+        url: '/images/global/mahalaxmi-banner-logo.webp',
         width: 1200,
         height: 630,
         alt: 'Mahalaxmi Telecom Private Limited',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Mahalaxmi Telecom | Mobile Stores & Franchise in Maharashtra',
     description: siteDescription,
-    images: ['/mahalaxmi-banner-logo.jpg'],
+    images: ['/images/global/mahalaxmi-banner-logo.webp'],
   },
   robots: {
     index: true,
@@ -68,8 +68,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: { url: '/icons/mahalaxmi-48-v1.png', type: 'image/png', sizes: '48x48' },
-    apple: { url: '/icons/mahalaxmi-180-v1.png', type: 'image/png', sizes: '180x180' },
+    icon: { url: '/images/global/icons/mahalaxmi-48-v1.png', type: 'image/png', sizes: '48x48' },
+    apple: { url: '/images/global/icons/mahalaxmi-180-v1.png', type: 'image/png', sizes: '180x180' },
   },
 };
 
@@ -86,8 +86,8 @@ export default function RootLayout({
         '@id': `${siteUrl}/#business`,
         name: siteName,
         url: siteUrl,
-        logo: `${siteUrl}/mahalaxmi-logo.png`,
-        image: `${siteUrl}/mahalaxmi-banner-logo.jpg`,
+        logo: `${siteUrl}/images/global/mahalaxmi-logo.webp`,
+        image: `${siteUrl}/images/global/mahalaxmi-banner-logo.webp`,
         description: siteDescription,
         telephone: '+91-96048-36936',
         email: 'contact@mahalaxmitelecom.in',

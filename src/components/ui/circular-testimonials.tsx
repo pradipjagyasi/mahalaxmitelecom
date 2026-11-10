@@ -42,28 +42,28 @@ export function CircularTestimonials({
           name: "Jagyasi Mobile",
           role: "Flagship Format - JM",
           message: "Our flagship, company-operated format focused on full-range mobile retail and premium in-store experience.",
-          image: "/jm-showroom-hero.png",
+          image: "/images/home/store-formats/Jagyasi%20Mobile.webp",
         },
         {
           name: "MM Mobile",
           role: "Standard Format - MM",
           message:
             "A standard-format store built for consistent, everyday mobile and accessory retail.",
-          image: "/page-section1/store-detail.jpg",
+          image: "/images/about/store-detail.webp",
         },
         {
           name: "Phone Café",
           role: "Compact Format - PC",
           message:
             "A compact, neighbourhood-friendly format for accessible mobile shopping.",
-          image: "/page-section1/hero-store.jpg",
+          image: "/images/franchise/hero-store.webp",
         },
         {
           name: "Mobile Point",
           role: "Emerging-Market Format - MP",
           message:
             "A focused retail point for devices and accessories in emerging markets.",
-          image: "/store_img.png",
+          image: "/images/global/store_img.webp",
         },
       ];
   const n = data.length;

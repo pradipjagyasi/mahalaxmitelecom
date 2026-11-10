@@ -15,117 +15,117 @@ const STORE_TESTIMONIALS = [
     role: "Flagship Format - JM",
     message:
       "Our flagship, company-operated format focused on full-range mobile retail and premium in-store experience.",
-    image: "/new-4-stores/Jagyasi%20Mobile.png",
+    image: "/images/brands/store-formats/Jagyasi%20Mobile.webp",
   },
   {
     name: "MM Mobile",
     role: "Standard Format - MM",
     message:
       "A standard-format store built for consistent, everyday mobile and accessory retail.",
-    image: "/new-4-stores/MM%20mobile.png",
+    image: "/images/brands/store-formats/MM%20mobile.webp",
   },
   {
     name: "Phone Café",
     role: "Compact Format - PC",
     message:
       "A compact, neighbourhood-friendly format for accessible mobile shopping.",
-    image: "/new-4-stores/Phone%20Cafe.png",
+    image: "/images/brands/store-formats/Phone%20Cafe.webp",
   },
   {
     name: "Mobile Point",
     role: "Emerging-Market Format - MP",
     message:
       "A focused retail point for devices and accessories in emerging markets.",
-    image: "/new-4-stores/Mobile%20Point.png",
+    image: "/images/brands/store-formats/Mobile%20Point.webp",
   },
 ];
 
 const PARTNER_BRANDS: CoverflowSlide[] = [
   {
     name: "Apple",
-    logo: "/brands/Brands-Card/apple.svg",
+    logo: "/images/brands/partner-logos/apple.svg",
     color: "#111111",
     kind: "svg",
     symbol: true,
   },
   {
     name: "Samsung",
-    logo: "/brands/Brands-Card/samsung.svg",
+    logo: "/images/brands/partner-logos/samsung.svg",
     color: "#1428a0",
     kind: "svg",
   },
   {
     name: "Xiaomi",
-    logo: "/brands/Brands-Card/xiaomi.svg",
+    logo: "/images/brands/partner-logos/xiaomi.svg",
     color: "#ff6900",
     kind: "svg",
     symbol: true,
   },
   {
     name: "OPPO",
-    logo: "/brands/Brands-Card/oppo.svg",
+    logo: "/images/brands/partner-logos/oppo.svg",
     color: "#006b3f",
     kind: "svg",
   },
   {
     name: "Motorola",
-    logo: "/brands/Brands-Card/motorola.svg",
+    logo: "/images/brands/partner-logos/motorola.svg",
     color: "#111111",
     kind: "svg",
     symbol: true,
   },
   {
     name: "vivo",
-    logo: "/brands/Brands-Card/vivo.svg",
+    logo: "/images/brands/partner-logos/vivo.svg",
     color: "#415fff",
     kind: "svg",
   },
   {
     name: "Noise",
-    logo: "/new-cards/Noise.jpg.webp",
+    logo: "/images/brands/partner-logos/Noise.jpg.webp",
     kind: "image",
     treatment: "invert-blend",
   },
   {
     name: "realme",
-    logo: "/new-cards/Realme-1.jpg.webp",
+    logo: "/images/brands/partner-logos/Realme-1.jpg.webp",
     kind: "image",
     treatment: "banner",
   },
   {
     name: "Nothing",
-    logo: "/new-cards/Nothing-1.jpg.webp",
+    logo: "/images/brands/partner-logos/Nothing-1.jpg.webp",
     kind: "image",
     treatment: "blend",
   },
   {
     name: "OnePlus",
-    logo: "/brands/Brands-Card/oneplus.svg",
+    logo: "/images/brands/partner-logos/oneplus.svg",
     color: "#f5010c",
     kind: "svg",
     symbol: true,
   },
   {
     name: "AI+",
-    logo: "/brands/Brands-Card/aiplus.png",
+    logo: "/images/brands/partner-logos/aiplus.webp",
     kind: "image",
     treatment: "ai-plus",
   },
   {
     name: "itel",
-    logo: "/brands/Brands-Card/itel.svg",
+    logo: "/images/brands/partner-logos/itel.svg",
     kind: "image",
     treatment: "wide",
   },
   {
     name: "boAt",
-    logo: "/brands/Brands-Card/boat-wordmark.svg",
+    logo: "/images/brands/partner-logos/boat-wordmark.svg",
     kind: "image",
     treatment: "wide",
   },
   {
     name: "Google Pixel",
-    logo: "/brands/Brands-Card/google-pixel.svg",
+    logo: "/images/brands/partner-logos/google-pixel.svg",
     kind: "image",
     treatment: "pixel-stack",
   },
@@ -136,31 +136,37 @@ const CATEGORIES = [
     id: "smartphones",
     name: "Smartphones",
     desc: "The latest devices, ready to experience in person.",
-    image: "/About-section/Smartphones.png",
+    image: "/images/brands/categories/Smartphones.webp",
   },
   {
     id: "tablets",
     name: "Tablets",
     desc: "For work, learning and everything between.",
-    image: "/About-section/Tablet.png",
+    image: "/images/brands/categories/Tablet.webp",
   },
   {
     id: "wearables",
     name: "Wearables",
     desc: "Connected technology that moves with you.",
-    image: "/About-section/Watches.png",
+    image: "/images/brands/categories/Watches.webp",
   },
   {
     id: "accessories",
     name: "Accessories",
     desc: "The essentials that complete every device.",
-    image: "/About-section/Accessories.png",
+    image: "/images/brands/categories/Accessories.webp",
   },
   {
     id: "electronics",
     name: "Electronics",
     desc: "Smart devices and lifestyle technology for every space.",
-    image: "/About-section/Electornics.png",
+    image: "/images/brands/categories/Electornics.webp",
+  },
+  {
+    id: "tvs",
+    name: "TVs",
+    desc: "Immersive screens and smart entertainment for every home.",
+    image: "/images/brands/categories/TV.webp",
   },
 ];
 
@@ -257,7 +263,7 @@ export default function BrandsPage() {
               ).map((category, index) => (
                 <article
                   key={category.id}
-                  className={`${styles.categoryCard}${index === 4 ? ` ${styles.categoryCardExtra}` : ""}`}
+                  className={`${styles.categoryCard}${index >= 4 ? ` ${styles.categoryCardExtra}` : ""}`}
                 >
                   <div className={styles.categoryImageWrap}>
                     <Image
@@ -265,7 +271,7 @@ export default function BrandsPage() {
                       alt=""
                       fill
                       sizes={
-                        index === 4
+                        index >= 4
                           ? "(max-width: 700px) 100vw, 50vw"
                           : "(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw"
                       }

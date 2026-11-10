@@ -132,7 +132,7 @@ export default function AboutPage() {
         <section className={styles.storySection}>
           <div className={styles.storyContainer}>
             <motion.img
-              src="/page-section1/store-detail.jpg"
+              src="/images/about/store-detail.webp"
               alt="Inside a Mahalaxmi Telecom retail outlet"
               className={styles.storyImage}
               initial={{ opacity: 0, y: 32 }}
@@ -328,7 +328,7 @@ export default function AboutPage() {
             <div className={styles.journeyLayout}>
               <div className={styles.journeyMedia}>
                 <img
-                  src="/page-section1/store-hero.jpg"
+                  src="/images/about/store-hero.webp"
                   alt="Inside a Mahalaxmi Telecom retail store"
                   loading="lazy"
                 />
@@ -392,7 +392,7 @@ export default function AboutPage() {
             </div>
 
             <img
-              src="page-section1/store-interior(1).jpg"
+              src="/images/about/store-interior(1).webp"
               alt="Mahalaxmi Telecom retail store ambience"
               className={styles.valuesImage}
             />

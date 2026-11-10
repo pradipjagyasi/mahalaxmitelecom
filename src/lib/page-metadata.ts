@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 const siteUrl = 'https://www.mahalaxmitelecom.in';
 const siteName = 'Mahalaxmi Telecom Private Limited';
 const shareImage = {
-  url: '/mahalaxmi-banner-logo.jpg',
+  url: '/images/global/mahalaxmi-banner-logo.webp',
   width: 1200,
   height: 630,
   alt: siteName,

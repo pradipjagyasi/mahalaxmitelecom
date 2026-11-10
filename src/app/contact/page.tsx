@@ -10,6 +10,8 @@ export default function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [companyWebsite, setCompanyWebsite] = useState('');
+  const [startedAt, setStartedAt] = useState(() => Date.now());
 
   useEffect(() => {
     const prefillEmail = () => {
@@ -46,28 +48,41 @@ export default function ContactPage() {
     setSubmitting(true);
     setErrorMessage('');
 
-    const scriptUrl =
-      'https://script.google.com/macros/s/AKfycbyT5jHdT2nISeUk6vBcRJp-0y-yPdmt4kPhLYoyRha4k5AG-lTLR6LZyLyTMo7cqvd_/exec';
-
     try {
-      // Google Apps Script requires text/plain or no-cors with fetch to avoid preflight CORS redirection blocks
-      await fetch(scriptUrl, {
+      const response = await fetch('/api/contact', {
         method: 'POST',
-        mode: 'no-cors',
         headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...form,
-          timestamp: new Date().toISOString(),
+          consent,
+          companyWebsite,
+          startedAt,
         }),
       });
 
+      const result = (await response.json().catch(() => null)) as
+        | { message?: string }
+        | null;
+      if (!response.ok) {
+        throw new Error(
+          result?.message ??
+            'Unable to submit your enquiry at this moment. Please try again.',
+        );
+      }
+
       setSubmitted(true);
       setForm({ name: '', phone: '', email: '', city: '', message: '' });
+      setCompanyWebsite('');
+      setStartedAt(Date.now());
       setConsent(false);
-    } catch {
-      setErrorMessage('Unable to submit your enquiry at this moment. Please try again or reach out directly via phone or email.');
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Unable to submit your enquiry at this moment. Please try again or reach out directly via phone or email.',
+      );
     } finally {
       setSubmitting(false);
     }
@@ -141,6 +156,19 @@ export default function ContactPage() {
                   <div className={styles.field}>
                     <label className={styles.fieldLabel} htmlFor="enquiry-message">Your Message</label>
                     <textarea id="enquiry-message" rows={5} placeholder="Store size, location, timeline..." value={form.message} onChange={set('message')} />
+                  </div>
+
+                  <div className={styles.honeypot} aria-hidden="true">
+                    <label htmlFor="enquiry-company-website">Company website</label>
+                    <input
+                      id="enquiry-company-website"
+                      name="companyWebsite"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={companyWebsite}
+                      onChange={(event) => setCompanyWebsite(event.target.value)}
+                    />
                   </div>
 
                   <label className={styles.consentBox}>

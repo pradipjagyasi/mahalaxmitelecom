@@ -375,3 +375,202 @@
     min-height: 440px;
   }
 }
+
+.gautamSection {
+  position: relative;
+  overflow: hidden;
+  background: #e9e2d6;
+  color: #191512;
+  border-top: 1px solid rgba(92, 81, 65, 0.18);
+  padding: 96px 0;
+}
+.gautamSection::before {
+  content: "";
+  position: absolute;
+  width: min(42vw, 620px);
+  aspect-ratio: 1;
+  right: -16%;
+  bottom: -52%;
+  border: 1px solid rgba(127, 138, 139, 0.26);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.gautamContainer {
+  position: relative;
+  width: min(100% - 64px, 1280px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: clamp(48px, 6vw, 88px);
+  align-items: center;
+}
+.gautamMedia {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  border: 1px solid rgb(193, 154, 95);
+  border-radius: 18px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at 72% 24%, #91e0d52e, #0000 40%), linear-gradient(145deg, #9ba6a6 0%, #4f6365 52%, #6e6e6e 100%)
+}
+.gautamMedia img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  filter: saturate(0.94) contrast(1.02);
+}
+.gautamMedia::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(28, 35, 37, 0.25), transparent 46%),
+    linear-gradient(110deg, rgba(193, 154, 95, 0.08), transparent 42%);
+  pointer-events: none;
+}
+.gautamChapter {
+  position: absolute;
+  z-index: 1;
+  left: 28px;
+  bottom: 18px;
+  color: rgba(248, 242, 232, 0.88);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(72px, 8vw, 118px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+.gautamCopy {
+  position: relative;
+  padding-left: clamp(28px, 4vw, 54px);
+}
+.gautamCopy::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: rgba(193, 154, 95, 0.72);
+}
+.gautamName {
+  margin: 0;
+  max-width: 680px;
+  color: #191512;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(48px, 5.5vw, 84px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+.gautamMeta {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+}
+.gautamRole,
+.gautamPerspective {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.gautamRole {
+  color: #76501f;
+}
+.gautamPerspective {
+  position: relative;
+  padding-left: 23px;
+  color: #5f634e;
+}
+.gautamPerspective::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1px;
+  height: 18px;
+  background: rgba(95, 99, 78, 0.48);
+  transform: translateY(-50%);
+}
+.gautamQuote {
+  margin: 38px 0 0;
+  max-width: 600px;
+  color: #252019;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 2.3vw, 30px);
+  line-height: 1.48;
+}
+.gautamQuote em {
+  color: #8a6128;
+  font-style: italic;
+}
+.gautamStatement {
+  margin: 28px 0 0;
+  max-width: 64ch;
+  color: #554d43;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.gautamStatement strong {
+  color: #76501f;
+  font-weight: 700;
+}
+.gautamSign {
+  margin: 34px 0 0;
+  color: #6d655b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .gautamSection {
+    padding: 72px 0;
+  }
+  .gautamContainer {
+    width: min(100% - 32px, 1280px);
+    grid-template-columns: 1fr;
+    gap: 46px;
+  }
+  .gautamMedia {
+    min-height: 440px;
+  }
+  .gautamCopy {
+    padding-left: 28px;
+  }
+}
+
+@media (max-width: 560px) {
+  .gautamSection {
+    padding: 56px 0 64px;
+  }
+  .gautamMedia {
+    min-height: 390px;
+  }
+  .gautamChapter {
+    left: 20px;
+    bottom: 14px;
+  }
+  .gautamCopy {
+    padding-left: 22px;
+  }
+  .gautamPerspective {
+    width: 100%;
+    padding-left: 0;
+  }
+  .gautamPerspective::before {
+    display: none;
+  }
+  .gautamQuote {
+    margin-top: 30px;
+  }
+}

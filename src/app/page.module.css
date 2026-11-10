@@ -109,6 +109,38 @@
 	font-style: italic;
 }
 
+.heroTitleReserve {
+	display: none;
+}
+
+.heroTitleAnimated {
+	display: inline;
+}
+
+/* Keep the typewriter's tallest wrapped phrase in the layout on touch-sized
+   screens so typing and deletion never move the rest of the page. */
+@media (max-width: 1100px) {
+	.heroTitleAccent {
+		display: grid;
+		width: 100%;
+	}
+
+	.heroTitleReserve,
+	.heroTitleAnimated {
+		grid-area: 1 / 1;
+	}
+
+	.heroTitleReserve {
+		display: block;
+		visibility: hidden;
+		pointer-events: none;
+	}
+
+	.heroTitleAnimated {
+		display: block;
+	}
+}
+
 
 .heroSubtitle {
 	max-width: 630px;
