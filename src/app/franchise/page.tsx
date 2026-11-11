@@ -252,11 +252,11 @@ export default function FranchisePage() {
             <div className={styles.planRow}>
               <div>
                 <p className={styles.planRowEyebrow}>Operation & ROI</p>
-                <h3 className={styles.planValue}>12-15 Months</h3>
+                <h3 className={styles.planValue}>15-18 Months</h3>
               </div>
               <p className={styles.planDesc}>
                 Each store typically needs two to three employees. The payback
-                period is 12 to 15 months, depending on sales volume.
+                period is 15 to 18 months, depending on sales volume.
               </p>
             </div>
             <div className={styles.planRow}>
